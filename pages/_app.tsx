@@ -23,6 +23,9 @@ export let theme = createTheme({
     success: {
       main: "#DB6773",
     },
+    info: {
+      main: "#3C8161",
+    },
   },
 });
 
