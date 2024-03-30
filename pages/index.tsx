@@ -1,4 +1,3 @@
-import * as React from "react";
 import {
   Autocomplete,
   Box,
@@ -6,12 +5,12 @@ import {
   Chip,
   FormControl,
   FormControlLabel,
-  FormHelperText,
   FormLabel,
-  Grid,
-  Paper,
+  Menu,
+  MenuItem,
   Radio,
   RadioGroup,
+  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -19,14 +18,15 @@ import {
   TableHead,
   TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import error from "next/error";
 import transformer from "@/lib/transformer";
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { ComponentModule } from "next/dist/build/webpack/loaders/metadata/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+import AnchorMenu from "@/component/anchor-menu";
 
 type CA = {
   ca: string;
@@ -59,9 +59,9 @@ type TransformerItem = {
 type Item = AccessoryItem | TransformerItem;
 
 type ItemAmount = {
-  item : Item,
-  amount : number
-}
+  item: Item;
+  amount: number;
+};
 
 const mockCA = [
   {
@@ -181,43 +181,19 @@ const itemList: Item[] = [
     type: "accessory",
     unit: "เมตร",
   },
-  ...transformer,
 ];
 
 export default function Home() {
   const [ca, setCA] = useState<CA | null>(null);
   const [packages, setPackages] = useState<Package[]>([]);
-  const [itemsAmount, setItemsAmount] = useState<ItemAmount[]>([
-    {
-      item:{
-        name: "Hotline Clamp & Bail Clamp",
-        price: 100,
-        type: "accessory",
-        unit: "ชุด",
-      },
-      amount: 0
-    },
-    {
-      item:{
-        name: "Drop Out Fuse Cutout",
-        price: 1000,
-        type: "accessory",
-        unit: "ชุด",
-      },
-      amount: 0
-    },
-    {
-      item:{
-        name: "Surge Arrester 30kV 5kA",
-        price: 100,
-        type: "accessory",
-        unit: "ชุด",
-      },
-      amount: 0
-    },
-  ]);
+  const [itemsAmount, setItemsAmount] = useState<ItemAmount[]>([]);
+  const [transformerAmount, setTransformerAmount] = useState<ItemAmount[]>([]);
+  const [forceReRender, setForceReRender] = useState(false);
+  const [addAccessory, setAddAccessory] = useState(false);
+  const [trList, setTrList] = useState<TransformerItem[]>([]);
+  const [trSizeSelection,setTrSizeSelection] = useState<string|null>(null)
 
-  const handleAutocomplete = (
+  const handleAutocompleteCA = (
     e: React.SyntheticEvent<Element, Event>,
     v: CA | null,
   ) => {
@@ -226,6 +202,70 @@ export default function Home() {
     } else {
       setCA(v);
     }
+  };
+
+  const handleAutoCompleteTr = (
+    e: React.SyntheticEvent<Element, Event>,
+    v: string | null,
+  ) => {
+    setTrSizeSelection(v)
+    if(!v){
+      setTrList([])
+      return
+    }
+    const trs = transformer as TransformerItem[];
+    let trslist = trs.filter((val) => {
+      return val.name == v;
+    });
+    setTrList(trslist);
+  };
+
+  const handleAutoCompleteAddTr = (
+    e: React.SyntheticEvent<Element, Event>,
+    v: TransformerItem | null,
+  ) => {
+    if (!v) {
+      setAddAccessory(!addAccessory);
+      return;
+    }
+    for (const tr of transformerAmount) {
+      if (tr.item.name == v.name && tr.item.type=="transformer" && v.product == tr.item.product) {
+        setAddAccessory(!addAccessory);
+        document.getElementById(`cell-${tr.item.name}-${tr.item.product}`)?.classList.add("shake");
+        setTimeout(() => {
+          document
+            .getElementById(`cell-${tr.item.name}-${tr.item.type=="transformer"&&tr.item.product}`)
+            ?.classList.remove("shake");
+        }, 1000);
+        return;
+      }
+    }
+    setAddAccessory(!addAccessory);
+    setTransformerAmount([...transformerAmount, { item: v, amount: 1 }]);
+  }
+
+  const handleAutoCompleteAccessory = (
+    e: React.SyntheticEvent<Element, Event>,
+    v: Item | null,
+  ) => {
+    if (!v) {
+      setAddAccessory(!addAccessory);
+      return;
+    }
+    for (const it of itemsAmount) {
+      if (it.item.name == v.name) {
+        setAddAccessory(!addAccessory);
+        document.getElementById(`cell-${it.item.name}`)?.classList.add("shake");
+        setTimeout(() => {
+          document
+            .getElementById(`cell-${it.item.name}`)
+            ?.classList.remove("shake");
+        }, 1000);
+        return;
+      }
+    }
+    setAddAccessory(!addAccessory);
+    setItemsAmount([...itemsAmount, { item: v, amount: 1 }]);
   };
 
   const handleClick = (pac: Package, isSelected?: boolean) => {
@@ -243,20 +283,70 @@ export default function Home() {
     }
   };
 
-  const handleAdd = (row:ItemAmount,i:number)=>{
-    console.log(row)
-    let it = itemsAmount
-    it[i].amount += 1
-    setItemsAmount(it)
-  }
+  const handleChangeAmountItem = (i: number, change: "add" | "remove") => {
+    let it = itemsAmount;
+    if (change == "add") {
+      it[i].amount += 1;
+    }
+    if (change == "remove" && it[i].amount > 0) {
+      it[i].amount -= 1;
+    }
+    if (
+      it[i].amount == 0 &&
+      window.confirm("ต้องการเอารายการนี้ออกใช่หรือไม่?")
+    ) {
+      it = it.filter((val) => {
+        return val.amount != 0;
+      });
+    }
+    setForceReRender(!forceReRender);
+    setItemsAmount(it);
+  };
 
-  const total = React.useMemo(() => {
+  const handleChangeAmountTr = (i: number, change: "add" | "remove") => {
+    let it = transformerAmount;
+    if (change == "add") {
+      it[i].amount += 1;
+    }
+    if (change == "remove" && it[i].amount > 0) {
+      it[i].amount -= 1;
+    }
+    if (
+      it[i].amount == 0 &&
+      window.confirm("ต้องการเอารายการนี้ออกใช่หรือไม่?")
+    ) {
+      it = it.filter((val) => {
+        return val.amount != 0;
+      });
+    }
+    setForceReRender(!forceReRender);
+    setTransformerAmount(it);
+  };
+
+  const total = useMemo(() => {
     let total = 0;
     for (const pac of packages) {
       total = total + pac.price;
     }
+    for (const it of itemsAmount) {
+      total = total + it.amount * it.item.price;
+    }
+    for (const it of transformerAmount) {
+      total = total + it.amount * it.item.price;
+    }
     return total * 1.07;
-  }, [packages]);
+  }, [packages, itemsAmount, forceReRender, transformerAmount]);
+
+  const transformerTypeList = useMemo(() => {
+    const trs: TransformerItem[] = transformer;
+    let list: string[] = [];
+    for (const tr of trs) {
+      list.push(tr.name);
+    }
+    return list.filter((value, index, array) => {
+      return array.indexOf(value) === index;
+    });
+  }, []);
 
   return (
     <div className="p-3">
@@ -265,7 +355,7 @@ export default function Home() {
         {!ca && (
           <Autocomplete
             id="combo-box-demo"
-            onChange={handleAutocomplete}
+            onChange={handleAutocompleteCA}
             disablePortal
             options={mockCA}
             getOptionLabel={(option) => option.ca}
@@ -282,7 +372,7 @@ export default function Home() {
         {!ca && (
           <Autocomplete
             id="combo-box-demo"
-            onChange={handleAutocomplete}
+            onChange={handleAutocompleteCA}
             disablePortal
             options={mockCA}
             getOptionLabel={(option) => option.name}
@@ -299,7 +389,7 @@ export default function Home() {
         {!ca && (
           <Autocomplete
             id="address"
-            onChange={handleAutocomplete}
+            onChange={handleAutocompleteCA}
             disablePortal
             options={mockCA}
             getOptionLabel={(option) => option.address}
@@ -320,10 +410,10 @@ export default function Home() {
         {!ca && (
           <Autocomplete
             id="combo-box-demo"
-            onChange={handleAutocomplete}
+            onChange={handleAutocompleteCA}
             disablePortal
             options={mockCA}
-            getOptionLabel={(option) => option.address}
+            getOptionLabel={(option) => option.tel}
             sx={{ width: "300px" }}
             renderInput={(params) => (
               <TextField variant="standard" {...params} />
@@ -336,24 +426,24 @@ export default function Home() {
       <Chip
         sx={{ fontSize: "18px", margin: "1rem 0 0 0" }}
         label={
-          <Typography sx={{ margin: "0 3rem 0 0" }}>
-            PM Preventive Maintenance
-          </Typography>
+          <div className="flex flex-row">
+            <Typography sx={{ margin: "0 3rem 0 0" }}>
+              PM Preventive Maintenance
+            </Typography>
+
+            <KeyboardArrowRightIcon
+              color="secondary"
+              sx={{
+                border: "solid 1px",
+                backgroundColor: "white",
+                borderRadius: "50%",
+                fill: "purple",
+              }}
+            />
+          </div>
         }
         color="secondary"
-        onClick={() => {}}
-        onDelete={() => {}}
-        deleteIcon={
-          <KeyboardArrowRightIcon
-            color="secondary"
-            sx={{
-              border: "solid 1px",
-              backgroundColor: "white",
-              borderRadius: "50%",
-              fill: "purple",
-            }}
-          />
-        }
+        clickable={false}
       />
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <Chip
@@ -435,31 +525,291 @@ export default function Home() {
           );
         })}
       </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center">
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <Chip
-          sx={{ fontSize: "18px", margin: "1rem 0 0 0" }}
+          sx={{ fontSize: "18px" }}
           label={
-            <Typography sx={{ margin: "0 3rem 0 0" }}>
-              Transfomer accessories
-            </Typography>
+            <div className=" flex flex-row">
+              <Typography sx={{ margin: "0 3rem 0 0" }}>Transfomer</Typography>
+              <KeyboardArrowRightIcon
+                color="secondary"
+                sx={{
+                  border: "solid 1px",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  fill: "purple",
+                }}
+              />
+            </div>
           }
           color="secondary"
-          onClick={() => {}}
-          onDelete={() => {}}
-          deleteIcon={
-            <KeyboardArrowRightIcon
-              color="secondary"
+          clickable={false}
+        />
+        <AnchorMenu
+          hasChange={addAccessory}
+          label={
+            <div className="flex flex-row items-center">
+              <span>เพิ่มรายการ</span>
+              <AddCircleOutlineIcon />
+            </div>
+          }
+          component={
+            <Box sx={{height:"400px"}} className="flex flex-col">
+              <Autocomplete
+                id="combo-box-demo"
+                disablePortal
+                options={transformerTypeList}
+                onChange={handleAutoCompleteTr}
+                value={trSizeSelection}
+                sx={{
+                  fontSize: "12px",
+                  width: "300px",
+                  margin: "1rem",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    color="secondary"
+                    variant="standard"
+                    {...params}
+                    label="หม้อแปลง"
+                  />
+                )}
+              />
+              {trList.length > 0 && (
+                <Autocomplete
+                id="combo-box-demo"
+                disablePortal
+                options={trList}
+                getOptionLabel={(option)=>option.product}
+                onChange={handleAutoCompleteAddTr}
+                value={null}
+                sx={{
+                  fontSize: "12px",
+                  width: "300px",
+                  margin: "1rem",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    color="secondary"
+                    variant="standard"
+                    {...params}
+                    label="ผู้ผลิต"
+                  />
+                )}
+              />
+              )}
+            </Box>
+          }
+        />
+      </div>
+
+      <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
+        <Table
+          sx={{ width: 1024, border: "none" }}
+          size="small"
+          aria-label="a dense table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"รายการ"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"ผู้ผลิต"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"จำนวน"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"ราคาต่อหน่วย (บาท)"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"ราคารรวม (บาท)"} />
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {transformerAmount.map((row, i) => (
+              <TableRow
+                id={`cell-${row.item.name}-${row.item.type == "transformer"&&row.item.product}`}
+                sx={{ margin: "0.5rem 0 0 0" }}
+                key={i}
+              >
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip
+                    component={
+                      <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                        {row.item.name}
+                      </Typography>
+                    }
+                  />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip
+                    component={
+                      row.item.type == "transformer" && <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                      {row.item.product}
+                    </Typography>
+                    }
+                  />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip
+                    component={
+                      <div className="flex flex-row justify-between items-center p-0">
+                        <span className="">{row.amount}</span>
+                        <div>
+                          <button onClick={() => handleChangeAmountTr(i, "add")}>
+                            <AddCircleOutlineIcon color="success" />
+                          </button>
+                          <button onClick={() => handleChangeAmountTr(i, "remove")}>
+                            <RemoveCircleOutlineIcon color="success" />
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip component={row.item.price} />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip component={row.item.price * row.amount} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <Chip
+          sx={{ fontSize: "18px" }}
+          label={
+            <div className=" flex flex-row">
+              <Typography sx={{ margin: "0 3rem 0 0" }}>
+                Transfomer accessories
+              </Typography>
+              <KeyboardArrowRightIcon
+                color="secondary"
+                sx={{
+                  border: "solid 1px",
+                  backgroundColor: "white",
+                  borderRadius: "50%",
+                  fill: "purple",
+                }}
+              />
+            </div>
+          }
+          color="secondary"
+          clickable={false}
+        />
+        <AnchorMenu
+          hasChange={addAccessory}
+          label={
+            <div className="flex flex-row items-center">
+              <span>เพิ่มรายการ</span>
+              <AddCircleOutlineIcon />
+            </div>
+          }
+          component={
+            <Autocomplete
+              id="combo-box-demo"
+              disablePortal
+              options={itemList}
+              value={null}
+              getOptionLabel={(option) => option.name}
+              onChange={handleAutoCompleteAccessory}
               sx={{
-                border: "solid 1px",
-                backgroundColor: "white",
-                borderRadius: "50%",
-                fill: "purple",
+                fontSize: "12px",
+                width: "300px",
+                height: "600px",
+                margin: "1rem",
               }}
+              renderInput={(params) => (
+                <TextField
+                  color="secondary"
+                  variant="standard"
+                  {...params}
+                  label="เพิ่มรายการ"
+                />
+              )}
             />
           }
         />
       </div>
 
+      <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
+        <Table
+          sx={{ width: 1024, border: "none" }}
+          size="small"
+          aria-label="a dense table"
+        >
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"รายการ"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"จำนวน"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"หน่วย"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"ราคาต่อหน่วย (บาท)"} />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip component={"ราคารรวม (บาท)"} />
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {itemsAmount.map((row, i) => (
+              <TableRow
+                id={`cell-${row.item.name}`}
+                sx={{ margin: "0.5rem 0 0 0" }}
+                key={i}
+              >
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip
+                    component={
+                      <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                        {row.item.name}
+                      </Typography>
+                    }
+                  />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip
+                    component={
+                      <div className="flex flex-row justify-between items-center p-0">
+                        <span className="">{row.amount}</span>
+                        <div>
+                          <button onClick={() => handleChangeAmountItem(i, "add")}>
+                            <AddCircleOutlineIcon color="success" />
+                          </button>
+                          <button onClick={() => handleChangeAmountItem(i, "remove")}>
+                            <RemoveCircleOutlineIcon color="success" />
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip component={row.item.unit} />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip component={row.item.price} />
+                </TableCell>
+                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                  <CellChip component={row.item.price * row.amount} />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <Chip
         sx={{
           fontSize: "16px",
@@ -484,54 +834,6 @@ export default function Home() {
         color="info"
         clickable={false}
       />
-      <TableContainer>
-      <Table
-        sx={{ width: 1024, border: "none" }}
-        size="small"
-        aria-label="a dense table"
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ border: "none", width: 175 }}>
-              <CellChip component={"รายการ"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175 }}>
-              <CellChip component={"จำนวน"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175 }}>
-              <CellChip component={"หน่วย"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175 }}>
-              <CellChip component={"ราคาต่อหน่วย (บาท)"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175 }}>
-              <CellChip component={"ราคารรวม (บาท)"} />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {itemsAmount.map((row, i) => (
-            <TableRow key={i}>
-              <TableCell sx={{ border: "none", width: 175 }}>
-                <CellChip component={row.item.name} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175 }}>
-                <CellChip component={row.amount} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175 }}>
-                <CellChip component={<Box sx={{display:"flex",flexDirection:"row",alignItems:"center"}}><Typography>{row.item.unit}</Typography><Button onClick={()=>handleAdd(row,i)}><AddCircleOutlineIcon color="success"/></Button></Box>} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175 }}>
-                <CellChip component={row.item.price} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175 }}>
-                <CellChip component={row.item.price*row.amount} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
     </div>
   );
 }
@@ -581,7 +883,8 @@ function CellChip({ component }: { component: any }) {
       sx={{
         width: "150px",
         fontSize: "12px",
-        height: 60
+        height: 60,
+        margin: "0.5rem 0 0 0",
       }}
       label={component}
       clickable={false}
