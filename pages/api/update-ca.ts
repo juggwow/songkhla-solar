@@ -27,8 +27,8 @@ export default async function handler(
   await mongoClient.connect()
 
   try{
-    await mongoClient.db("digital-tr").collection("items").drop()
-    const collection = await mongoClient.db("digital-tr").createCollection("items")
+    await mongoClient.db("digital-tr").collection("ca").drop()
+    const collection = await mongoClient.db("digital-tr").createCollection("ca")
     
     const updateResult = await collection.insertMany(data)
     if(!updateResult.acknowledged){
