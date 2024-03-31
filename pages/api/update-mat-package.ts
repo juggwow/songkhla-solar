@@ -21,8 +21,8 @@ export default async function handler(
     res.status(401).end()
     return
   }
-  const data = JSON.parse(req.body);
-  
+  const data = req.body;
+  console.log(data)
   const mongoClient = await clientPromise
   await mongoClient.connect()
 
@@ -44,57 +44,7 @@ export default async function handler(
     return
   }
 
-  res.status(200).json({ name: "John Doe" });
+  res.status(200).end();
   return
 }
 
-const itemList = [
-  {
-    name: "Hotline Clamp & Bail Clamp",
-    price: 100,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "Drop Out Fuse Cutout",
-    price: 1000,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "Surge Arrester 30kV 5kA",
-    price: 100,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "Surge Arrester 0.4kV",
-    price: 100,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "LT switch FSD",
-    price: 100,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "LT switch",
-    price: 100,
-    type: "accessory",
-    unit: "ชุด",
-  },
-  {
-    name: "Wiring MV",
-    price: 100,
-    type: "accessory",
-    unit: "เมตร",
-  },
-  {
-    name: "Wireing LV",
-    price: 100,
-    type: "accessory",
-    unit: "เมตร",
-  },
-];
