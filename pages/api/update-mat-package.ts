@@ -21,7 +21,7 @@ export default async function handler(
     res.status(401).end()
     return
   }
-  const data = req.body;
+  const data = JSON.parse(req.body);
   console.log(data)
   const mongoClient = await clientPromise
   await mongoClient.connect()
@@ -44,7 +44,7 @@ export default async function handler(
     return
   }
 
-  res.status(200).end();
+  res.status(200).json({name:"test"});
   return
 }
 
