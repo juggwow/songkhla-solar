@@ -42,6 +42,7 @@ type Package = {
 };
 
 type AccessoryItem = {
+  _id?: string;
   name: string;
   price: number;
   type: "accessory";
@@ -49,6 +50,7 @@ type AccessoryItem = {
 };
 
 type TransformerItem = {
+  id?: string
   name: string;
   price: number;
   type: "transformer";
@@ -138,48 +140,56 @@ const itemList: Item[] = [
     price: 100,
     type: "accessory",
     unit: "ชุด",
+    _id: "111"
   },
   {
     name: "Drop Out Fuse Cutout",
     price: 1000,
     type: "accessory",
     unit: "ชุด",
+    _id: "222"
   },
   {
     name: "Surge Arrester 30kV 5kA",
     price: 100,
     type: "accessory",
     unit: "ชุด",
+    _id: "113"
   },
   {
     name: "Surge Arrester 0.4kV",
     price: 100,
     type: "accessory",
     unit: "ชุด",
+    _id: "114"
   },
   {
     name: "LT switch FSD",
     price: 100,
     type: "accessory",
     unit: "ชุด",
+    _id: "115"
   },
   {
     name: "LT switch",
     price: 100,
     type: "accessory",
     unit: "ชุด",
+    _id: "116"
   },
   {
     name: "Wiring MV",
     price: 100,
     type: "accessory",
     unit: "เมตร",
+    _id: "117"
   },
   {
     name: "Wireing LV",
     price: 100,
     type: "accessory",
     unit: "เมตร",
+    _id: "1311"
   },
 ];
 
@@ -834,8 +844,17 @@ export default function Home() {
         color="info"
         clickable={false}
       />
+      <button onClick={()=>{
+        fetch('api/update-mat-package',{
+          method: "POST",
+          headers: {
+            "Authorization" : `${process.env.NEXT_PUBLIC_API}`
+          },
+          body: JSON.stringify(itemList)
+        })
+      }}>test</button>
     </div>
-  );
+  )
 }
 
 function ItemPackage({
