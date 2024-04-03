@@ -22,7 +22,6 @@ export default async function handler(
     return
   }
   const data = req.body;
-  console.log(data)
   const mongoClient = await clientPromise
   await mongoClient.connect()
 

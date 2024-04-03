@@ -33,7 +33,7 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <main className={mitr.className}>
       <ThemeProvider theme={theme}>
-        <Component {...pageProps} />;
+        <Component {...pageProps} />
       </ThemeProvider>
     </main>
   );
