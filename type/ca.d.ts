@@ -4,7 +4,7 @@ export type CA = {
     address: string;
   };
 
-export type TableType= {
+export type TableCA= {
   page: number;
   rowsPerPage: number
 }

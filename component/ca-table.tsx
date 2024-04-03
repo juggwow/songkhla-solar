@@ -6,8 +6,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { CA, TableType } from '@/type/ca';
-import { Button, Pagination, TablePagination } from '@mui/material';
+import { CA, TableCA } from '@/type/ca';
+import { Button, Pagination, TablePagination, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { useState,useEffect } from 'react';
 
@@ -31,7 +31,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 
-export default function CATable({cas,handleSearchQoute,handleChangeTable}:{cas:CA[],handleSearchQoute:(ca:string)=>void,handleChangeTable:(page:number,rowsPerPage:number)=>void}) {
+export default function CATable({cas,handleSearchQoute,handleChangeTable,count}:{cas:CA[],handleSearchQoute:(ca:string)=>void,handleChangeTable:(page:number,rowsPerPage:number)=>void,count:number}) {
     const [page,setPage] = useState(0)
     const [rowsPerPage,setRowsPerPage] = useState(10)
 
@@ -58,9 +58,10 @@ export default function CATable({cas,handleSearchQoute,handleChangeTable}:{cas:C
           ))}
         </TableBody>
       </Table>
+      {cas.length == 0 && (<Typography>ไม่มีข้อมูล</Typography>)}
       <TablePagination
         component="div"
-        count={100}
+        count={count}
         page={page}
         onPageChange={(e,v)=>setPage(v)}
         rowsPerPage={rowsPerPage}
