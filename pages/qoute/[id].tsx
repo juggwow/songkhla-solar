@@ -21,7 +21,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
@@ -111,11 +111,11 @@ export default function Home({
   caQoute,itemList,thermalPackage,premuimPackage,standardPackage,transformer
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter()
-  if(!caQoute){
-    return(
-      <Box><Typography>ไม่มีข้อมูล</Typography><Button onClick={()=>router.push("/")}>กลับหน้าหลัก</Button></Box>
-    )
-  }
+  useEffect(()=>{
+    if(!caQoute){
+      router.push("/")
+    }
+  },[])
   
 
   const [ca, setCA] = useState<CA>(caQoute?caQoute.customer:{
@@ -793,8 +793,8 @@ export default function Home({
               รวมเป็นเงินทั้งสิ้น {total.toLocaleString("th-TH")} บาท
               รวมภาษีมูลค่าเพิ่ม 7%
             </Typography>
-            <Button onClick={()=>handleSave(caQoute._id)}><SaveIcon/></Button>
-            <Button onClick={()=>handleDelete(caQoute._id)}><DeleteIcon/></Button>
+            <Button onClick={()=>caQoute && handleSave(caQoute._id)}><SaveIcon/></Button>
+            <Button onClick={()=>caQoute && handleDelete(caQoute._id)}><DeleteIcon/></Button>
             <Button><PrintIcon/></Button>
           </Box>
         }
