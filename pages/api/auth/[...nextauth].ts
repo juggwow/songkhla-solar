@@ -31,9 +31,10 @@ export default NextAuth({
             return false
         }
         const mongoClient = await clientPromise
-        mongoClient.connect()
+        await mongoClient.connect()
         
         const resultFindEmail = await mongoClient.db("digital-tr").collection("emails").findOne({email:user.email})
+        await mongoClient.close()
         if(!resultFindEmail){
             return false
         }
