@@ -2,6 +2,8 @@ import clientPromise from "@/lib/mongodb";
 import { CA, CAWithQouteCount, TableCA } from "@/type/ca";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]";
 
 type Data = {
   cas: CAWithQouteCount[];
@@ -12,6 +14,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
+  const session = await getServerSession(req, res, authOptions)
+  if(!session){
+    res.status(401).end()
+    return
+  }
+  
   if (req.method != "POST") {
     res.status(404).end();
     return;

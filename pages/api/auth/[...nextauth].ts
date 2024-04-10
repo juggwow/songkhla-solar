@@ -1,23 +1,9 @@
 import clientPromise from "@/lib/mongodb"
-import NextAuth from "next-auth"
+import NextAuth, { User } from "next-auth"
+import { AdapterUser } from "next-auth/adapters"
 import GoogleProvider from "next-auth/providers/google"
 
 export const authOptions = {
-  providers: [
-    GoogleProvider({
-        clientId: process.env.NEXTAUTH_GOOGLE_CLIENT_ID as string,
-        clientSecret: process.env.NEXTAUTH_GOOGLE_CLIENT_SECRET as string
-      })
-  ],
-  callback: {
-    signIn:async () => {
-        console.log("test")
-        return true
-    }
-  }
-}
-
-export default NextAuth({
     // Configure one or more authentication providers
     providers: [
       GoogleProvider({
@@ -26,9 +12,9 @@ export default NextAuth({
         })
     ],
     callbacks: {
-      signIn:async ({user}) => {
+      signIn:async ({user}:{user:User|AdapterUser}) => {
         if(!user.email){
-            return false
+            return "/unauthorization"
         }
         const mongoClient = await clientPromise
         await mongoClient.connect()
@@ -36,9 +22,14 @@ export default NextAuth({
         const resultFindEmail = await mongoClient.db("digital-tr").collection("emails").findOne({email:user.email})
         await mongoClient.close()
         if(!resultFindEmail){
-            return false
+            return "/unauthorization"
         }
         return true
       }
+    },
+    pages:{
+        signIn:"/googlelogin"
     }
-  })
+  }
+
+export default NextAuth(authOptions)

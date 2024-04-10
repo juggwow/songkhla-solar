@@ -2,6 +2,8 @@ import clientPromise from "@/lib/mongodb";
 import { CA, CAQoute, TableCA } from "@/type/ca";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../../auth/[...nextauth]";
 
 type Data = {
   id: string;
@@ -11,6 +13,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data | CAQoute>,
 ) {
+  const session = await getServerSession(req, res, authOptions)
+  if(!session){
+    res.status(401).end()
+    return
+  }
+  
   const { id } = req.query;
         if (typeof id != "string") {
           res.status(404).end();
@@ -66,6 +74,11 @@ export default async function handler(
 
         await mongoClient.close();
         res.status(200).end()
+        return
+      }
+      default:{
+        await mongoClient.close()
+        res.status(404).end()
         return
       }
     }
