@@ -30,21 +30,23 @@ import AnchorMenu from "@/component/anchor-menu";
 import { CA, CAQoute, CAWithQouteCount, TableCA } from "@/type/ca";
 import CATable from "@/component/ca-table";
 import { useRouter } from "next/router";
+import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
 
 export default function Home() {
   const router = useRouter();
-  const [searchCA, setSearchCA] = useState<CA>({
-    ca: "",
-    name: "",
-    address: "",
-  });
-  const [tableCA, setTableCA] = useState<TableCA>({
-    rowsPerPage: 10,
-    page: 0,
-  });
-  const [cas, setCAs] = useState<CAWithQouteCount[]>([]);
-  const [countCA, setCountCA] = useState(0);
-  const [showCAQoutes, setShowCAQoutes] = useState<CAQoute[]>([]);
+
+  const {
+    searchCA,
+    setSearchCA,
+    tableCA,
+    setTableCA,
+    cas,
+    setCAs,
+    countCA,
+    setCountCA,
+    showCAQoutes,
+    setShowCAQoutes,
+  } = useSearchCAQoute();
 
   const handleSearchQoute = async (ca: string) => {
     const res = await fetch(`/api/ca/ca-qoute/${ca}`);

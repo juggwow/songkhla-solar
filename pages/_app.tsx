@@ -4,6 +4,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Noto_Sans_Thai } from "next/font/google";
 import { MaterialProvider } from "@/component/meterial-context";
 import { SessionProvider } from "next-auth/react";
+import { SearchCAQouteProvider } from "@/component/search-ca-qoute-context";
 
 const mitr = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
@@ -39,9 +40,11 @@ export default function App({
     <main className={mitr.className}>
       <ThemeProvider theme={theme}>
         <SessionProvider session={session}>
-          <MaterialProvider>
-            <Component {...pageProps} />
-          </MaterialProvider>
+          <SearchCAQouteProvider>
+            <MaterialProvider>
+              <Component {...pageProps} />
+            </MaterialProvider>
+          </SearchCAQouteProvider>
         </SessionProvider>
       </ThemeProvider>
     </main>
