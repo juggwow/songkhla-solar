@@ -2,6 +2,8 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { Noto_Sans_Thai } from "next/font/google";
+import { MaterialProvider } from "@/component/meterial-context";
+import { SessionProvider } from "next-auth/react";
 
 const mitr = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
@@ -29,11 +31,18 @@ export let theme = createTheme({
   },
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}: AppProps) {
   return (
     <main className={mitr.className}>
       <ThemeProvider theme={theme}>
-        <Component {...pageProps} />
+        <SessionProvider session={session}>
+          <MaterialProvider>
+            <Component {...pageProps} />
+          </MaterialProvider>
+        </SessionProvider>
       </ThemeProvider>
     </main>
   );

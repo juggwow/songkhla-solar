@@ -69,7 +69,7 @@ export default function CATable({
                 align="right"
                 className="flex flex-row"
               >
-                {row.quoteCount>0&&(
+                {row.quoteCount > 0 && (
                   <Button
                     sx={{ width: 30 }}
                     onClick={() => handleSearchQoute(row.ca)}

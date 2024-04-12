@@ -6,8 +6,8 @@ export type CA = {
 };
 
 export type CAWithQouteCount = CA & {
-  quoteCount: number
-}
+  quoteCount: number;
+};
 
 export type TableCA = {
   page: number;
@@ -27,7 +27,7 @@ export type AccessoryItem = {
   price: number;
   type: "accessory";
   unit: string;
-  labour: number
+  labour: number;
 };
 
 export type TransformerItem = {
@@ -37,7 +37,7 @@ export type TransformerItem = {
   type: "transformer";
   product: string;
   unit: string;
-  labour: number
+  labour: number;
 };
 
 export type AccessoryItemAmount = {
@@ -51,9 +51,17 @@ export type TransformerItemAmount = {
 };
 
 export type CAQoute = {
-  _id: string
+  _id: string;
   customer: CA;
   package: Package[];
   accessory: AccessoryItemAmount[];
   transformer: TransformerItemAmount[];
+};
+
+export type MaterialData = {
+  itemList: AccessoryItem[];
+  thermalPackage: Package[];
+  premuimPackage: Package[];
+  standardPackage: Package[];
+  transformer: TransformerItem[];
 };

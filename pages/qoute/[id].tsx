@@ -25,9 +25,9 @@ import { useEffect, useMemo, useState } from "react";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import SaveIcon from '@mui/icons-material/Save';
-import DeleteIcon from '@mui/icons-material/Delete';
-import PrintIcon from '@mui/icons-material/Print';
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PrintIcon from "@mui/icons-material/Print";
 import AnchorMenu from "@/component/anchor-menu";
 import {
   AccessoryItem,
@@ -42,16 +42,12 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/router";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
+import { useMaterial } from "@/component/meterial-context";
 
 export const getServerSideProps = (async (context) => {
   const propsnull = {
     props: {
       caQoute: null,
-      itemList: [],
-      thermalPackage: [],
-      premuimPackage: [],
-      standardPackage: [],
-      transformer: []
     },
   };
   if (
@@ -69,68 +65,71 @@ export const getServerSideProps = (async (context) => {
   const mongoClient = await clientPromise;
   await mongoClient.connect();
 
-  const db = mongoClient.db("digital-tr")
+  const db = mongoClient.db("digital-tr");
 
   try {
-    const resultFindCAQoute = await db
-      .collection("ca-qoute")
-      .findOne(
-        { _id: new ObjectId(id) },
-        {
-          projection: {
-            _id: {$toString:"$_id"},
-            customer: 1,
-            package: 1,
-            transformer: 1,
-            accessory: 1,
-          },
+    const resultFindCAQoute = await db.collection("ca-qoute").findOne(
+      { _id: new ObjectId(id) },
+      {
+        projection: {
+          _id: { $toString: "$_id" },
+          customer: 1,
+          package: 1,
+          transformer: 1,
+          accessory: 1,
         },
-      );
+      },
+    );
     if (!resultFindCAQoute) {
       await mongoClient.close();
       return propsnull;
     }
     const caQoute = resultFindCAQoute as unknown as CAQoute;
-    console.log(caQoute)
 
-    const itemCollection = db.collection("items")
-    const itemList = (await itemCollection.find({ type: "accessory" }).toArray()) as unknown as AccessoryItem[]
-    const thermalPackage = (await itemCollection.find({ type: "thermal" }).toArray()) as unknown as Package[]
-    const premuimPackage = (await itemCollection.find({ type: "premium package transformer" }).toArray()) as unknown as Package[]
-    const standardPackage = (await itemCollection.find({ type: "standard package transformer" }).toArray()) as unknown as Package[]
-    const transformer = (await itemCollection.find({ type: "transformer" }).toArray()) as unknown as TransformerItem[]
-
-    return { props: { caQoute,itemList,thermalPackage,premuimPackage,standardPackage,transformer } };
+    return { props: { caQoute } };
   } catch (e) {
     await mongoClient.close();
     return propsnull;
   }
-}) satisfies GetServerSideProps<{ caQoute: CAQoute | null,itemList: AccessoryItem[],thermalPackage: Package[],premuimPackage: Package[],standardPackage: Package[],transformer: TransformerItem[] }>;
+}) satisfies GetServerSideProps<{ caQoute: CAQoute | null }>;
 
 export default function Home({
-  caQoute,itemList,thermalPackage,premuimPackage,standardPackage,transformer
+  caQoute,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const router = useRouter()
-  useEffect(()=>{
-    if(!caQoute){
-      router.push("/")
+  const router = useRouter();
+  useEffect(() => {
+    if (!caQoute) {
+      router.push("/");
     }
-  },[])
-  
+  }, []);
 
-  const [ca, setCA] = useState<CA>(caQoute?caQoute.customer:{
-    ca:"",
-    name:"",
-    tel:"",
-    address:""
-  });
-  const [packages, setPackages] = useState<Package[]>(caQoute?caQoute.package:[]);
+  const {
+    itemList,
+    thermalPackage,
+    premuimPackage,
+    standardPackage,
+    transformer,
+  } = useMaterial();
+
+  const [ca, setCA] = useState<CA>(
+    caQoute
+      ? caQoute.customer
+      : {
+          ca: "",
+          name: "",
+          tel: "",
+          address: "",
+        },
+  );
+  const [packages, setPackages] = useState<Package[]>(
+    caQoute ? caQoute.package : [],
+  );
   const [itemsAmount, setItemsAmount] = useState<AccessoryItemAmount[]>(
-    caQoute?caQoute.accessory:[]
+    caQoute ? caQoute.accessory : [],
   );
   const [transformerAmount, setTransformerAmount] = useState<
     TransformerItemAmount[]
-  >(caQoute?caQoute.transformer:[]);
+  >(caQoute ? caQoute.transformer : []);
   const [forceReRender, setForceReRender] = useState(false);
   const [addAccessory, setAddAccessory] = useState(false);
   const [trList, setTrList] = useState<TransformerItem[]>([]);
@@ -263,30 +262,35 @@ export default function Home({
     setTransformerAmount(it);
   };
 
-  const handleSave = async(id:string)=>{
-    const res = await fetch(`/api/ca/ca-qoute/${id}`,{
+  const handleSave = async (id: string) => {
+    const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({customer:ca,package:packages,transformer:transformerAmount,accessory:itemsAmount})
-    })
-    if(res.status !== 200){
-      console.log("err")
-      return
+      body: JSON.stringify({
+        customer: ca,
+        package: packages,
+        transformer: transformerAmount,
+        accessory: itemsAmount,
+      }),
+    });
+    if (res.status !== 200) {
+      console.log("err");
+      return;
     }
-  }
+  };
 
-  const handleDelete = async(id:string)=>{
-    const res = await fetch(`/api/ca/ca-qoute/${id}`,{
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "DELETE",
-    })
-    if(res.status !== 200){
-      console.log("err")
-      return
+    });
+    if (res.status !== 200) {
+      console.log("err");
+      return;
     }
-    router.push("/")
-  }
+    router.push("/");
+  };
 
   const total = useMemo(() => {
     let total = 0;
@@ -319,38 +323,38 @@ export default function Home({
         <span>หมายเลขผู้ใช้ไฟ(CA): </span>
         <TextField
           value={ca.ca}
-            variant="standard"
-            disabled
-            sx={{ width: "300px" }}
-          />
+          variant="standard"
+          disabled
+          sx={{ width: "300px" }}
+        />
       </div>
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <span>ชื่อผู้ใช้ไฟ: </span>
-        
+
         <TextField
           value={ca.name}
-            variant="standard"
-            sx={{width: "300px"}}
-            onChange={(e)=>setCA({...ca,name:e.target.value})}
-          />
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, name: e.target.value })}
+        />
       </div>
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <span>สถานที่: </span>
         <TextField
           value={ca.address}
-            variant="standard"
-            sx={{width: "500px"}}
-            onChange={(e)=>setCA({...ca,address:e.target.value})}
-          />
+          variant="standard"
+          sx={{ width: "500px" }}
+          onChange={(e) => setCA({ ...ca, address: e.target.value })}
+        />
       </div>
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <span>หมายเลขโทรศัพท์: </span>
         <TextField
           value={ca.tel}
-            variant="standard"
-            sx={{width: "300px"}}
-            onChange={(e)=>setCA({...ca,tel:e.target.value})}
-          />
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, tel: e.target.value })}
+        />
       </div>
 
       <Chip
@@ -793,9 +797,15 @@ export default function Home({
               รวมเป็นเงินทั้งสิ้น {total.toLocaleString("th-TH")} บาท
               รวมภาษีมูลค่าเพิ่ม 7%
             </Typography>
-            <Button onClick={()=>caQoute && handleSave(caQoute._id)}><SaveIcon/></Button>
-            <Button onClick={()=>caQoute && handleDelete(caQoute._id)}><DeleteIcon/></Button>
-            <Button><PrintIcon/></Button>
+            <Button onClick={() => caQoute && handleSave(caQoute._id)}>
+              <SaveIcon />
+            </Button>
+            <Button onClick={() => caQoute && handleDelete(caQoute._id)}>
+              <DeleteIcon />
+            </Button>
+            <Button>
+              <PrintIcon />
+            </Button>
           </Box>
         }
         color="info"

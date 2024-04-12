@@ -32,7 +32,7 @@ import CATable from "@/component/ca-table";
 import { useRouter } from "next/router";
 
 export default function Home() {
-  const router = useRouter()
+  const router = useRouter();
   const [searchCA, setSearchCA] = useState<CA>({
     ca: "",
     name: "",
@@ -44,15 +44,15 @@ export default function Home() {
   });
   const [cas, setCAs] = useState<CAWithQouteCount[]>([]);
   const [countCA, setCountCA] = useState(0);
-  const [showCAQoutes,setShowCAQoutes] = useState<CAQoute[]>([])
+  const [showCAQoutes, setShowCAQoutes] = useState<CAQoute[]>([]);
 
   const handleSearchQoute = async (ca: string) => {
-    const res = await fetch(`/api/ca/ca-qoute/${ca}`)
-    if(res.status != 200){
-      console.log("error")
-      return
+    const res = await fetch(`/api/ca/ca-qoute/${ca}`);
+    if (res.status != 200) {
+      console.log("error");
+      return;
     }
-    setShowCAQoutes(await res.json() as CAQoute[])
+    setShowCAQoutes((await res.json()) as CAQoute[]);
   };
 
   const handleCreateQoute = async (ca: string) => {
@@ -63,11 +63,11 @@ export default function Home() {
       },
       body: JSON.stringify({ ca }),
     });
-    if(res.status != 200){
-      return
+    if (res.status != 200) {
+      return;
     }
-    const {id} = await res.json()
-    router.push(`/qoute/${id}`)
+    const { id } = await res.json();
+    router.push(`/qoute/${id}`);
   };
 
   const handleSearchCAs = async () => {
@@ -79,24 +79,29 @@ export default function Home() {
       body: JSON.stringify({ searchCA, tableCA }),
     });
     if (res.status == 200) {
-      const { cas, count }: { cas: CAWithQouteCount[]; count: { count: number } } =
+      const {
+        cas,
+        count,
+      }: { cas: CAWithQouteCount[]; count: { count: number } } =
         await res.json();
       setCAs(cas);
       setCountCA(count.count);
     }
   };
 
-  const handleDelete = async(id:string)=>{
-    const res = await fetch(`/api/ca/ca-qoute/${id}`,{
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "DELETE",
-    })
-    if(res.status !== 200){
-      console.log("err")
-      return
+    });
+    if (res.status !== 200) {
+      console.log("err");
+      return;
     }
-    let caqs = showCAQoutes.filter(val=>{return val._id != id})
-    setShowCAQoutes(caqs)
-  }
+    let caqs = showCAQoutes.filter((val) => {
+      return val._id != id;
+    });
+    setShowCAQoutes(caqs);
+  };
 
   // const handleChangeCATable = async (page: number, rowsPerPage: number) => {
   //   setTableCA({ page, rowsPerPage });
@@ -168,17 +173,21 @@ export default function Home() {
         handleCreateQoute={handleCreateQoute}
       />
 
-      {showCAQoutes.map(val=>{
-        return(
+      {showCAQoutes.map((val) => {
+        return (
           <Box key={val._id}>
             <Typography>{val.customer.name}</Typography>
             <Typography>จำนวนรายการ package: {val.package.length}</Typography>
-            <Typography>จำนวนรายการหม้อแปลง : {val.transformer.length}</Typography>
+            <Typography>
+              จำนวนรายการหม้อแปลง : {val.transformer.length}
+            </Typography>
             <Typography>จำนวนรายการ accessory: {val.package.length}</Typography>
-            <Button onClick={()=>router.push(`qoute/${val._id}`)}>แก้ไข</Button>
-            <Button onClick={()=>handleDelete(val._id)}>ลบ</Button>
+            <Button onClick={() => router.push(`qoute/${val._id}`)}>
+              แก้ไข
+            </Button>
+            <Button onClick={() => handleDelete(val._id)}>ลบ</Button>
           </Box>
-        )
+        );
       })}
     </div>
   );

@@ -14,12 +14,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  const session = await getServerSession(req, res, authOptions)
-  if(!session){
-    res.status(401).end()
-    return
+  const session = await getServerSession(req, res, authOptions);
+  if (!session) {
+    res.status(401).end();
+    return;
   }
-  
+
   if (req.method != "POST") {
     res.status(404).end();
     return;
@@ -43,7 +43,7 @@ export default async function handler(
           ca: 1,
           name: 1,
           address: 1,
-          quoteCount: 1
+          quoteCount: 1,
         },
       },
       {

@@ -13,12 +13,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
 ) {
-  const session = await getServerSession(req, res, authOptions)
-  if(!session){
-    res.status(401).end()
-    return
+  const session = await getServerSession(req, res, authOptions);
+  if (!session) {
+    res.status(401).end();
+    return;
   }
-  
+
   const mongoClient = await clientPromise;
   await mongoClient.connect();
 
@@ -65,16 +65,16 @@ export default async function handler(
         res.send({ id: resultInsert.insertedId.toHexString() });
         return;
       }
-      default:{
-        await mongoClient.close()
-        res.status(404).end()
-        return
+      default: {
+        await mongoClient.close();
+        res.status(404).end();
+        return;
       }
     }
   } catch (e) {
     await mongoClient.close();
     console.log(e);
     res.status(500).end();
-    return
+    return;
   }
 }
