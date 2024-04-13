@@ -1,40 +1,12 @@
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Chip,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Menu,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Snackbar,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import transformer from "@/lib/transformer";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
-import AnchorMenu from "@/component/anchor-menu";
-import { CA, CAQoute, CAWithQouteCount, TableCA } from "@/type/ca";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import { useEffect } from "react";
+import { CAQoute, CAWithQouteCount } from "@/type/ca";
 import CATable from "@/component/ca-table";
 import { useRouter } from "next/router";
 import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
 
 export default function Home() {
   const router = useRouter();
-
   const {
     searchCA,
     setSearchCA,
@@ -105,27 +77,7 @@ export default function Home() {
     setShowCAQoutes(caqs);
   };
 
-  // const handleChangeCATable = async (page: number, rowsPerPage: number) => {
-  //   setTableCA({ page, rowsPerPage });
-  //   const res = await fetch("/api/ca/search-cas", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({ searchCA, tableCA: { page, rowsPerPage } }),
-  //   });
-  //   if (res.status == 200) {
-  //     const { cas, count }: { cas: CA[]; count: { count: number } } =
-  //       await res.json();
-  //     setCAs(cas);
-  //     setCountCA(count.count);
-  //   }
-  // };
-
   useEffect(() => {
-    if (searchCA.address == "" && searchCA.ca == "" && searchCA.name == "") {
-      return;
-    }
     handleSearchCAs();
   }, [tableCA]);
 
