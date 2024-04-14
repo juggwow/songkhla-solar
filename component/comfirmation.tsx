@@ -1,21 +1,6 @@
 import { Button } from "@mui/material";
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-  Font,
-} from "@react-pdf/renderer";
 
 import { useState } from "react";
-import { Sarabun } from "next/font/google";
-
-const sarabun = Sarabun({
-  subsets: ["thai", "latin"],
-  weight: ["400", "500", "600", "700"],
-})
 
 // Create Document Component
 export default function BasicDocument() {
