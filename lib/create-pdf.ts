@@ -1,10 +1,13 @@
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit'
 import fs from 'fs';
+import path from 'path';
+
 
 export async function createPDF() {
+    const fontPath = path.join(process.cwd(), 'public/fonts/THSarabunNew.ttf');
     // อ่านไฟล์ฟอนต์ THSarabunNew จาก public/fonts
-    const fontBytes = fs.readFileSync('public/fonts/THSarabunNew.ttf');
+    const fontBytes = fs.readFileSync(fontPath);
 
     // สร้างเอกสาร PDF ใหม่
     const pdfDoc = await PDFDocument.create();
