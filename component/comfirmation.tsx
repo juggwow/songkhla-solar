@@ -10,56 +10,36 @@ import {
 } from "@react-pdf/renderer";
 
 import { useState } from "react";
+import { Sarabun } from "next/font/google";
 
-Font.register({
-  family: "THSarabunNew",
-  src: "./../public/fonts/THSarabunNew.ttf",
-});
-
-
-const styles = StyleSheet.create({
-  font: {
-    fontFamily: 'THSarabunNew',
-    fontSize: 12,
-  },
-  page: {
-    backgroundColor: "#d11fb6",
-    color: "white",
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-  },
-  viewer: {
-    width: 1024, //the pdf viewer will take up all of the width and height
-  },
-});
+const sarabun = Sarabun({
+  subsets: ["thai", "latin"],
+  weight: ["400", "500", "600", "700"],
+})
 
 // Create Document Component
 export default function BasicDocument() {
-  const [open, isOpen] = useState(false);
+  const handleClick = async()=>{
+    const res = await fetch("/api/generate-pdf")
+    if(res.status!=200){
+      console.log("error")
+      return
+    }
+    // สร้าง URL สำหรับดาวน์โหลด PDF
+    const {file} = await res.json()
+    const pdfBlob = Buffer.from(file as string, 'base64');
+    const pdfUrl = URL.createObjectURL(new Blob([pdfBlob]));
 
-
+    // สร้างลิงก์สำหรับดาวน์โหลด PDF
+    const downloadLink = document.createElement('a');
+    downloadLink.href = pdfUrl;
+    downloadLink.download = 'generated_pdf.pdf';
+    downloadLink.click();
+  }
   
   return (
     <div>
-      <Button onClick={() => isOpen(true)}>เปิดสิ!!</Button>
-      {open && (
-        <PDFViewer style={styles.viewer}>
-          {/* Start of the document*/}
-          <Document>
-            {/*render a single page*/}
-            <Page size="A4" style={styles.page}>
-              <View style={styles.section}>
-                <Text style={styles.font}>Hello ทดสอบๆๆๆๆๆ</Text>
-              </View>
-              <View style={styles.section}>
-                <Text>World</Text>
-              </View>
-            </Page>
-          </Document>
-        </PDFViewer>
-      )}
+      <Button onClick={() => handleClick()}>เปิดสิ!!</Button>
     </div>
   );
 }
