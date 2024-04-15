@@ -310,8 +310,10 @@ export default function Home({
 
   const handleDownload = async(caQoute:CAQoute|null)=>{
     if(!caQoute){
+      alert("ไม่มีข้อมูลผู้ใช้ไฟ","warning")
       return
     }
+    loading(true)
     const res = await fetch("/api/generate-pdf", {
       method: "POST",
       headers: {
@@ -319,16 +321,18 @@ export default function Home({
       },
       body: JSON.stringify(caQoute),
     })
+    loading(false)
     if(res.status!=200){
+      alert("ไม่สามารถ Download เอกสารได้ กรุณาลองใหม่อีกครั้ง","error")
       console.log("error")
       return
     }
-    // สร้าง URL สำหรับดาวน์โหลด PDF
+
+    alert("Download สำเร็จ","success")
     const {file} = await res.json()
     const pdfBlob = Buffer.from(file as string, 'base64');
     const pdfUrl = URL.createObjectURL(new Blob([pdfBlob]));
 
-    // สร้างลิงก์สำหรับดาวน์โหลด PDF
     const downloadLink = document.createElement('a');
     downloadLink.href = pdfUrl;
     downloadLink.download = 'generated_pdf.pdf';

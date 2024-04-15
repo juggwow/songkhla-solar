@@ -4,6 +4,7 @@ import { CAQoute, CAWithQouteCount } from "@/type/ca";
 import CATable from "@/component/ca-table";
 import { useRouter } from "next/router";
 import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
+import { useAlertLoading } from "@/component/alert-loading";
 
 export default function Home() {
   const router = useRouter();
@@ -20,6 +21,8 @@ export default function Home() {
     setShowCAQoutes,
   } = useSearchCAQoute();
 
+  const {loading,alert} = useAlertLoading()
+
   const handleSearchQoute = async (ca: string) => {
     const res = await fetch(`/api/ca/ca-qoute/${ca}`);
     if (res.status != 200) {
@@ -30,6 +33,7 @@ export default function Home() {
   };
 
   const handleCreateQoute = async (ca: string) => {
+    loading(true)
     const res = await fetch("/api/ca/ca-qoute", {
       method: "POST",
       headers: {
@@ -37,7 +41,9 @@ export default function Home() {
       },
       body: JSON.stringify({ ca }),
     });
+    loading(false)
     if (res.status != 200) {
+      alert("เกิดข้อผิดพลาด ไม่สร้างมาสร้างแบบตอบรับได้","error")
       return;
     }
     const { id } = await res.json();
@@ -45,6 +51,7 @@ export default function Home() {
   };
 
   const handleSearchCAs = async () => {
+    loading(true)
     const res = await fetch("/api/ca/search-cas", {
       method: "POST",
       headers: {
@@ -52,6 +59,7 @@ export default function Home() {
       },
       body: JSON.stringify({ searchCA, tableCA }),
     });
+    loading(false)
     if (res.status == 200) {
       const {
         cas,
@@ -64,11 +72,13 @@ export default function Home() {
   };
 
   const handleDelete = async (id: string) => {
+    loading(true)
     const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "DELETE",
     });
+    loading(false)
     if (res.status !== 200) {
-      console.log("err");
+      alert("เกิดข้อผิดพลาดในการลบ ลองใหม่อีกครั้ง","error")
       return;
     }
     let caqs = showCAQoutes.filter((val) => {
