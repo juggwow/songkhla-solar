@@ -6,6 +6,7 @@ import {
   createContext,
   useContext,
   useState,
+  useCallback
 } from "react";
 
 type ContextType = {
@@ -19,6 +20,7 @@ type ContextType = {
   setCountCA: Dispatch<SetStateAction<number>>;
   showCAQoutes: CAQoute[];
   setShowCAQoutes: Dispatch<SetStateAction<CAQoute[]>>;
+  clearCATable: ()=>void
 };
 
 const SearchCAQouteContext = createContext<ContextType | undefined>(undefined);
@@ -36,6 +38,20 @@ export function SearchCAQouteProvider({ children }: { children: ReactNode }) {
   const [cas, setCAs] = useState<CAWithQouteCount[]>([]);
   const [countCA, setCountCA] = useState(0);
   const [showCAQoutes, setShowCAQoutes] = useState<CAQoute[]>([]);
+  const clearCATable = useCallback(()=>{
+    setSearchCA({
+      ca: "",
+      name: "",
+      address: "",
+    })
+    setTableCA({
+      rowsPerPage: 10,
+      page: 0,
+    })
+    setCAs([])
+    setCountCA(0)
+    setShowCAQoutes([])
+  },[])
   return (
     <SearchCAQouteContext.Provider
       value={{
@@ -49,6 +65,7 @@ export function SearchCAQouteProvider({ children }: { children: ReactNode }) {
         setCountCA,
         showCAQoutes,
         setShowCAQoutes,
+        clearCATable
       }}
     >
       {children}

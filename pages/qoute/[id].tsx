@@ -43,6 +43,8 @@ import { useRouter } from "next/router";
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import { useMaterial } from "@/component/meterial-context";
+import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
+import { useAlertLoading } from "@/component/alert-loading";
 
 export const getServerSideProps = (async (context) => {
   const propsnull = {
@@ -110,6 +112,10 @@ export default function Home({
     standardPackage,
     transformer,
   } = useMaterial();
+
+  const {alert,loading} = useAlertLoading()
+
+  const {clearCATable} = useSearchCAQoute()
 
   const [ca, setCA] = useState<CA>(
     caQoute
@@ -263,6 +269,7 @@ export default function Home({
   };
 
   const handleSave = async (id: string) => {
+    loading(true)
     const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "PATCH",
       headers: {
@@ -275,22 +282,58 @@ export default function Home({
         accessory: itemsAmount,
       }),
     });
+    loading(false)
     if (res.status !== 200) {
+      alert("เกิดข้อผิดพลาด ไม่สามารถบันทึกได้","error")
       console.log("err");
       return;
     }
+    alert("บันทึกสำเร็จ","success")
+    clearCATable()
   };
 
   const handleDelete = async (id: string) => {
+    loading(true)
     const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "DELETE",
     });
+    loading(false)
     if (res.status !== 200) {
       console.log("err");
+      alert("เกิดข้อผิดพลาด ไม่สามารถลบได้","error")
       return;
     }
+    alert("ลบสำเร็จ","success")
+    clearCATable()
     router.push("/");
   };
+
+  const handleDownload = async(caQoute:CAQoute|null)=>{
+    if(!caQoute){
+      return
+    }
+    const res = await fetch("/api/generate-pdf", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(caQoute),
+    })
+    if(res.status!=200){
+      console.log("error")
+      return
+    }
+    // สร้าง URL สำหรับดาวน์โหลด PDF
+    const {file} = await res.json()
+    const pdfBlob = Buffer.from(file as string, 'base64');
+    const pdfUrl = URL.createObjectURL(new Blob([pdfBlob]));
+
+    // สร้างลิงก์สำหรับดาวน์โหลด PDF
+    const downloadLink = document.createElement('a');
+    downloadLink.href = pdfUrl;
+    downloadLink.download = 'generated_pdf.pdf';
+    downloadLink.click();
+  }
 
   const total = useMemo(() => {
     let total = 0;
@@ -396,7 +439,7 @@ export default function Home({
             <ItemPackage
               key={i}
               standardPackage={val}
-              isSelected={packages.includes(val)}
+              isSelected={hasSelected(packages,val)}
               handleClick={handleClick}
             />
           );
@@ -419,7 +462,7 @@ export default function Home({
             <ItemPackage
               key={i}
               standardPackage={val}
-              isSelected={packages.includes(val)}
+              isSelected={hasSelected(packages,val)}
               handleClick={handleClick}
             />
           );
@@ -454,7 +497,7 @@ export default function Home({
               key={i}
               standardPackage={val}
               handleClick={handleClick}
-              isSelected={packages.includes(val)}
+              isSelected={hasSelected(packages,val)}
             />
           );
         })}
@@ -803,7 +846,7 @@ export default function Home({
             <Button onClick={() => caQoute && handleDelete(caQoute._id)}>
               <DeleteIcon />
             </Button>
-            <Button>
+            <Button onClick={() => handleDownload(caQoute)}>
               <PrintIcon />
             </Button>
           </Box>
@@ -868,4 +911,12 @@ function CellChip({ component }: { component: any }) {
       color="primary"
     />
   );
+}
+
+function hasSelected(pacs:Package[],pac:Package):boolean{
+  let packages:string[] = []
+  for(const p of pacs){
+    packages.push(p._id)
+  }
+  return packages.includes(pac._id)
 }

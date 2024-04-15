@@ -1,5 +1,6 @@
-import { createPDF } from "@/lib/create-pdf";
+import { generateConfirmationPDF } from "@/lib/create-pdf";
 import clientPromise from "@/lib/mongodb";
+import { CAQoute } from "@/type/ca";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
@@ -12,7 +13,7 @@ export default async function handler(
   res: NextApiResponse<Data>,
 ){
     try{
-        const base64 = await createPDF()
+        const base64 = await generateConfirmationPDF(req.body as CAQoute)
         res.send({file: base64})
     return 
     }catch(e){
