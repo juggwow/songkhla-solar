@@ -1,7 +1,15 @@
 import { Snackbar, Alert } from "@mui/material";
 import { Backdrop, CircularProgress } from "@mui/material";
 import { AlertColor } from "@mui/material";
-import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useState, useCallback } from "react";
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+} from "react";
 
 type AlertSnackBarType = {
   open: boolean;
@@ -14,52 +22,47 @@ type SetPropsAlertSnackBar = {
   setSnackBar: Dispatch<SetStateAction<AlertSnackBarType>>;
 };
 
-
 type SetPropsLoadingBackDrop = {
-    progress: boolean;
+  progress: boolean;
 };
 
 type AlertAndLoadingContextType = {
-    loading: (isLoad:boolean)=>void;
-    alert: (msg:string,sevirity:AlertColor)=>void
+  loading: (isLoad: boolean) => void;
+  alert: (msg: string, sevirity: AlertColor) => void;
+};
+
+const AlertAndLoadingContext = createContext<
+  AlertAndLoadingContextType | undefined
+>(undefined);
+
+export function AlertAndLoading({ children }: { children: ReactNode }) {
+  const [snackBar, setSnackBar] = useState<AlertSnackBarType>({
+    open: false,
+    sevirity: "success",
+    message: "",
+  });
+  const [progress, setProgress] = useState(false);
+  const loading = useCallback((isLoaded: boolean) => {
+    setProgress(isLoaded);
+  }, []);
+  const alert = useCallback((message: string, sevirity: AlertColor) => {
+    setSnackBar({
+      open: true,
+      message,
+      sevirity,
+    });
+  }, []);
+
+  return (
+    <AlertAndLoadingContext.Provider value={{ loading, alert }}>
+      {children}
+      <AlertSnackBar snackBar={snackBar} setSnackBar={setSnackBar} />
+      <LoadingBackDrop progress={progress} />
+    </AlertAndLoadingContext.Provider>
+  );
 }
 
-const AlertAndLoadingContext = createContext<AlertAndLoadingContextType| undefined>(undefined);
-
-
-export function AlertAndLoading({ children }: { children: ReactNode }){
-    const [snackBar,setSnackBar] = useState<AlertSnackBarType>({
-        open: false,
-        sevirity: "success",
-        message: ""
-    })
-    const [progress,setProgress] = useState(false)
-    const loading = useCallback((isLoaded:boolean)=>{
-        setProgress(isLoaded)
-    },[])
-    const alert = useCallback((message:string,sevirity:AlertColor)=>{
-        setSnackBar({
-            open:true,
-            message,
-            sevirity
-        })
-    },[])
-
-    return(
-        <AlertAndLoadingContext.Provider value={{loading,alert}}>
-            {children}
-            <AlertSnackBar snackBar={snackBar} setSnackBar={setSnackBar} />
-            <LoadingBackDrop progress={progress} />
-        </AlertAndLoadingContext.Provider>
-
-    )
-}
-  
-
-function AlertSnackBar({
-  snackBar,
-  setSnackBar,
-}: SetPropsAlertSnackBar) {
+function AlertSnackBar({ snackBar, setSnackBar }: SetPropsAlertSnackBar) {
   return (
     <Snackbar
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
@@ -77,11 +80,7 @@ function AlertSnackBar({
   );
 }
 
-
-
-function LoadingBackDrop({
-  progress,
-}: SetPropsLoadingBackDrop) {
+function LoadingBackDrop({ progress }: SetPropsLoadingBackDrop) {
   return (
     <Backdrop
       sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -93,9 +92,9 @@ function LoadingBackDrop({
 }
 
 export function useAlertLoading() {
-    const context = useContext(AlertAndLoadingContext);
-    if (!context) {
-      throw new Error("useMyContext must be used within a MyProvider");
-    }
-    return context;
+  const context = useContext(AlertAndLoadingContext);
+  if (!context) {
+    throw new Error("useMyContext must be used within a MyProvider");
   }
+  return context;
+}

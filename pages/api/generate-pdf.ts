@@ -11,14 +11,14 @@ type Data = {
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>,
-){
-    try{
-        const base64 = await generateConfirmationPDF(req.body as CAQoute)
-        res.send({file: base64})
-    return 
-    }catch(e){
-        console.log(e)
-        res.status(500).end()
-        return
-    }
+) {
+  try {
+    const base64 = await generateConfirmationPDF(req.body as CAQoute);
+    res.send({ file: base64 });
+    return;
+  } catch (e) {
+    console.log(e);
+    res.status(500).end();
+    return;
+  }
 }

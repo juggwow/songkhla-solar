@@ -21,7 +21,7 @@ export default function Home() {
     setShowCAQoutes,
   } = useSearchCAQoute();
 
-  const {loading,alert} = useAlertLoading()
+  const { loading, alert } = useAlertLoading();
 
   const handleSearchQoute = async (ca: string) => {
     const res = await fetch(`/api/ca/ca-qoute/${ca}`);
@@ -33,7 +33,7 @@ export default function Home() {
   };
 
   const handleCreateQoute = async (ca: string) => {
-    loading(true)
+    loading(true);
     const res = await fetch("/api/ca/ca-qoute", {
       method: "POST",
       headers: {
@@ -41,9 +41,9 @@ export default function Home() {
       },
       body: JSON.stringify({ ca }),
     });
-    loading(false)
+    loading(false);
     if (res.status != 200) {
-      alert("เกิดข้อผิดพลาด ไม่สร้างมาสร้างแบบตอบรับได้","error")
+      alert("เกิดข้อผิดพลาด ไม่สร้างมาสร้างแบบตอบรับได้", "error");
       return;
     }
     const { id } = await res.json();
@@ -51,7 +51,7 @@ export default function Home() {
   };
 
   const handleSearchCAs = async () => {
-    loading(true)
+    loading(true);
     const res = await fetch("/api/ca/search-cas", {
       method: "POST",
       headers: {
@@ -59,7 +59,7 @@ export default function Home() {
       },
       body: JSON.stringify({ searchCA, tableCA }),
     });
-    loading(false)
+    loading(false);
     if (res.status == 200) {
       const {
         cas,
@@ -72,13 +72,13 @@ export default function Home() {
   };
 
   const handleDelete = async (id: string) => {
-    loading(true)
+    loading(true);
     const res = await fetch(`/api/ca/ca-qoute/${id}`, {
       method: "DELETE",
     });
-    loading(false)
+    loading(false);
     if (res.status !== 200) {
-      alert("เกิดข้อผิดพลาดในการลบ ลองใหม่อีกครั้ง","error")
+      alert("เกิดข้อผิดพลาดในการลบ ลองใหม่อีกครั้ง", "error");
       return;
     }
     let caqs = showCAQoutes.filter((val) => {
