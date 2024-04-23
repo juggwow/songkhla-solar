@@ -71,6 +71,11 @@ export default function Home() {
     }
   };
 
+  const handleEditQoute =async (id:string)=>{
+    loading(true)
+    router.push(`qoute/${id}`)  
+  }
+
   const handleDelete = async (id: string) => {
     loading(true);
     const res = await fetch(`/api/ca/ca-qoute/${id}`, {
@@ -146,7 +151,7 @@ export default function Home() {
               จำนวนรายการหม้อแปลง : {val.transformer.length}
             </Typography>
             <Typography>จำนวนรายการ accessory: {val.package.length}</Typography>
-            <Button onClick={() => router.push(`qoute/${val._id}`)}>
+            <Button onClick={()=>handleEditQoute(val._id)}>
               แก้ไข
             </Button>
             <Button onClick={() => handleDelete(val._id)}>ลบ</Button>

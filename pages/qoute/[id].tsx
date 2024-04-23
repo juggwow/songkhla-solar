@@ -314,28 +314,42 @@ export default function Home({
       return;
     }
     loading(true);
-    const res = await fetch("/api/generate-pdf", {
+    const thisQoute:CAQoute = {
+      _id: caQoute._id,
+      customer: ca,
+      package: packages,
+      accessory: itemsAmount,
+      transformer: transformerAmount 
+    }
+    const data = convertData(thisQoute,total) 
+    const option = {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(caQoute),
-    });
+      body: JSON.stringify({
+        name: caQoute.customer.name,
+        ca: caQoute.customer.ca,
+        peaNo: "66-12345678",
+        kVA: "250",
+        trType: "Conventional Tank",
+        sign: "นายหนึ่ง ไม่ใช่สอง",
+        data
+      })
+    }
+    const res = await fetch('https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec',option)
+    const {msg} = await res.json()
     loading(false);
-    if (res.status != 200) {
+    if (msg == "error") {
       alert("ไม่สามารถ Download เอกสารได้ กรุณาลองใหม่อีกครั้ง", "error");
       console.log("error");
       return;
     }
 
     alert("Download สำเร็จ", "success");
-    const { file } = await res.json();
-    const pdfBlob = Buffer.from(file as string, "base64");
+    const pdfBlob = Buffer.from(msg as string, "base64");
     const pdfUrl = URL.createObjectURL(
       new Blob([pdfBlob], { type: "application/pdf" }),
     );
 
-    // เปิด URL ของ PDF ในหน้าต่างใหม่
+    //เปิด URL ของ PDF ในหน้าต่างใหม่
     window.open(pdfUrl, "_blank");
 
     // const downloadLink = document.createElement('a');
@@ -355,7 +369,7 @@ export default function Home({
     for (const it of transformerAmount) {
       total = total + it.amount * (it.item.price + it.item.labour);
     }
-    return total * 1.07;
+    return total;
   }, [packages, itemsAmount, forceReRender, transformerAmount]);
 
   const transformerTypeList = useMemo(() => {
@@ -368,6 +382,10 @@ export default function Home({
       return array.indexOf(value) === index;
     });
   }, []);
+
+  useEffect(()=>{
+    loading(false)
+  },[])
 
   return (
     <div className="p-3">
@@ -846,7 +864,7 @@ export default function Home({
             }}
           >
             <Typography>
-              รวมเป็นเงินทั้งสิ้น {total.toLocaleString("th-TH")} บาท
+              รวมเป็นเงินทั้งสิ้น {(total*1.07).toLocaleString("th-TH")} บาท
               รวมภาษีมูลค่าเพิ่ม 7%
             </Typography>
             <Button onClick={() => caQoute && handleSave(caQoute._id)}>
@@ -929,3 +947,50 @@ function hasSelected(pacs: Package[], pac: Package): boolean {
   }
   return packages.includes(pac._id);
 }
+
+function convertData(caQoute:CAQoute,total:number){
+  let data = ""
+  let itemindex = 1
+  if(caQoute.package.length != 0){
+    caQoute.package.forEach((val,i)=>{
+      if(val.type == "standard package transformer"){
+        data = data+`${itemindex}. ค่าบริการบำรุงรักษาหม้อแปลงไฟฟ้า จำนวน 12 รายการ จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      }
+      else if(val.type == "premium package transformer"){
+        data = data+`${itemindex}. ${premiumPackageMap.get(val.name)} จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      }
+      else if(val.type == "thermal"){
+        data = data+`${itemindex}. ${thermalPackageMap.get(val.name)} จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      }
+      itemindex = itemindex+1
+    })
+  }
+  if(caQoute.transformer.length != 0){
+    caQoute.transformer.forEach(val=>{
+      data = data+`${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${((val.item.price+val.item.labour)*val.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      itemindex = itemindex+1
+    })
+  }
+  if(caQoute.accessory.length != 0){
+    data = data+`${itemindex}. ค่าอุปกรณ์ประกอบหม้อแปลงจำนวน ${caQoute.accessory.length} รายการ ดังนี้\n`
+    caQoute.accessory.forEach(val=>{
+      data = data+`   -${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${((val.item.price+val.item.labour)*val.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+    })
+  }
+  data = data + `ราคารวมทั้งสิ้น จำนวน ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+  data = data + `ภาษีมูลค่าเพิ่ม 7% จำนวน ${(total*0.07).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+  data = data + `ราคารวมภาษีมูลค่าเพิ่มเป็นเงิน ${(total*1.07).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท`
+  return data
+}
+
+const premiumPackageMap = new Map([
+  ["Package 1","ค่าบำรุงรักษาหม้อแปลง Package 1 จำนวน 11 รายการ"],
+  ["Package 2","ค่าบำรุงรักษาหม้อแปลง Package 2 จำนวน 10 รายการ"],
+  ["Package 3","ค่าบำรุงรักษาหม้อแปลง Package 3 จำนวน 10 รายการ"],
+  ["Package 4","ค่าบำรุงรักษาหม้อแปลง Package 4 จำนวน 8 รายการ"]
+])
+
+const thermalPackageMap = new Map([
+  ["ครึ่งวันหรือ < 3.5 ช.ม.","ส่องจุดร้อนด้วยกล้องส่องความร้อน จำนวนครึ่งวัน หรือไม่เกิน 3.5 ชั่วโมง"],
+  ["ครึ่งวันหรือ < 7 ช.ม.","ส่องจุดร้อนด้วยกล้องส่องความร้อน จำนวน 1 วัน หรือไม่เกิน 7 ชั่วโมง"]
+])

@@ -4,17 +4,23 @@ import { CAQoute } from "@/type/ca";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 
-type Data = {
-  file: string;
-};
-
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<any>,
 ) {
   try {
-    const base64 = await generateConfirmationPDF(req.body as CAQoute);
-    res.send({ file: base64 });
+    if(req.method != "POST"){
+      res.status(404).end()
+      return
+    }
+    const resultAppScript = await fetch('https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec',
+    {
+      method: "POST",
+      body: JSON.stringify({
+        test: "test"
+      })
+    })
+    res.send(await resultAppScript.json())
     return;
   } catch (e) {
     console.log(e);
