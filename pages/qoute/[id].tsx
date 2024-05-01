@@ -118,6 +118,11 @@ export default function Home({
           name: "",
           tel: "",
           address: "",
+          peaNo: "",
+          kVA: "",
+          trType: "",
+          sign: "",
+          rank: ""
         },
   );
   const [packages, setPackages] = useState<PackageAmount[]>(
@@ -320,10 +325,10 @@ export default function Home({
       body: JSON.stringify({
         name: caQoute.customer.name,
         ca: caQoute.customer.ca,
-        peaNo: "66-12345678",
-        kVA: "250",
-        trType: "Conventional Tank",
-        sign: "นายหนึ่ง ไม่ใช่สอง",
+        peaNo: caQoute.customer.peaNo,
+        kVA: caQoute.customer.kVA,
+        trType: caQoute.customer.trType,
+        sign: caQoute.customer.sign,
         data
       })
     }
@@ -399,6 +404,56 @@ export default function Home({
           variant="standard"
           sx={{ width: "300px" }}
           onChange={(e) => setCA({ ...ca, name: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>ชื่อผู้ลงนาม: </span>
+
+        <TextField
+          value={ca.sign}
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, sign: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>เรียนถึง: </span>
+
+        <TextField
+          value={ca.rank}
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, rank: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>PEA NO: </span>
+
+        <TextField
+          value={ca.peaNo}
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, peaNo: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>ขนาดของหม้อแปลง kVA: </span>
+
+        <TextField
+          value={ca.kVA}
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, kVA: e.target.value })}
+        />
+      </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>ชนิดของหม้อแปลง: </span>
+
+        <TextField
+          value={ca.trType}
+          variant="standard"
+          sx={{ width: "300px" }}
+          onChange={(e) => setCA({ ...ca, trType: e.target.value })}
         />
       </div>
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">

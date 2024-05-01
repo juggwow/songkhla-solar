@@ -3,6 +3,11 @@ export type CA = {
   name: string;
   address: string;
   tel?: string;
+  peaNo?: string;
+  kVA?: string;
+  trType?: string;
+  sign?: string
+  rank?: string
 };
 
 export type CAWithQouteCount = CA & {
