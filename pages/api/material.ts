@@ -4,6 +4,7 @@ import {
   AccessoryItem,
   MaterialData,
   Package,
+  Qouter,
   TransformerItem,
 } from "@/type/ca";
 import { ObjectId } from "mongodb";
@@ -44,12 +45,14 @@ export default async function handler(
     const transformer = (await itemCollection
       .find({ type: "transformer" })
       .toArray()) as unknown as TransformerItem[];
+    const qouterlist = (await mongoClient.db("digital-tr").collection("qouter").find().toArray()) as unknown as Qouter[]
     res.send({
       itemList,
       thermalPackage,
       premuimPackage,
       standardPackage,
       transformer,
+      qouterlist,
     });
   } catch (e) {
     console.log(e);

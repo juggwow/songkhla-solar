@@ -24,6 +24,8 @@ export type Package = {
   name: string;
   price: number;
   type: string;
+  longName: string;
+  profit: number;
 };
 
 export type AccessoryItem = {
@@ -33,6 +35,9 @@ export type AccessoryItem = {
   type: "accessory";
   unit: string;
   labour: number;
+  subType: string;
+  longName: string;
+  profit: number
 };
 
 export type TransformerItem = {
@@ -43,6 +48,7 @@ export type TransformerItem = {
   product: string;
   unit: string;
   labour: number;
+  profit: number;
 };
 
 export type AccessoryItemAmount = {
@@ -68,10 +74,17 @@ export type CAQoute = {
   transformer: TransformerItemAmount[];
 };
 
+export type Qouter = {
+  qouter: string;
+  qouterRank: string;
+  qouterTel: string;
+}
+
 export type MaterialData = {
   itemList: AccessoryItem[];
   thermalPackage: Package[];
   premuimPackage: Package[];
   standardPackage: Package[];
   transformer: TransformerItem[];
+  qouterlist: Qouter[];
 };

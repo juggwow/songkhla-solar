@@ -28,6 +28,7 @@ import {
   CAQoute,
   Package,
   PackageAmount,
+  Qouter,
   TransformerItem,
   TransformerItemAmount,
 } from "@/type/ca";
@@ -80,7 +81,6 @@ export const getServerSideProps = (async (context) => {
       return propsnull;
     }
     const caQoute = resultFindCAQoute as unknown as CAQoute;
-
     return { props: { caQoute } };
   } catch (e) {
     await mongoClient.close();
@@ -104,6 +104,7 @@ export default function Home({
     premuimPackage,
     standardPackage,
     transformer,
+    qouterlist
   } = useMaterial();
 
   const { alert, loading } = useAlertLoading();
@@ -137,7 +138,14 @@ export default function Home({
   const [forceReRender, setForceReRender] = useState(false);
   const [addAccessory, setAddAccessory] = useState(false);
   const [trList, setTrList] = useState<TransformerItem[]>([]);
+  const [accList,setAccList] = useState<AccessoryItem[]>([])
+  const [accSubTypeSelection,setAccSubTypeSelection] = useState<string|null>(null)
   const [trSizeSelection, setTrSizeSelection] = useState<string | null>(null);
+  const [qouter,setQouter] = useState<Qouter>({
+    qouter: "",
+    qouterRank: "",
+    qouterTel: ""
+  })
 
   const handleAutoCompleteTr = (
     e: React.SyntheticEvent<Element, Event>,
@@ -189,6 +197,22 @@ export default function Home({
 
   const handleAutoCompleteAccessory = (
     e: React.SyntheticEvent<Element, Event>,
+    v: string | null,
+  ) => {
+    setAccSubTypeSelection(v);
+    if (!v) {
+      setTrList([]);
+      return;
+    }
+    const accs = itemList as AccessoryItem[];
+    let accslist = accs.filter((val) => {
+      return val.subType == v;
+    });
+    setAccList(accslist);
+  };
+  
+  const handleAutoCompleteAddAccessory = (
+    e: React.SyntheticEvent<Element, Event> | null,
     v: AccessoryItem | null,
   ) => {
     if (!v) {
@@ -323,13 +347,17 @@ export default function Home({
     const option = {
       method: "POST",
       body: JSON.stringify({
-        name: caQoute.customer.name,
-        ca: caQoute.customer.ca,
-        peaNo: caQoute.customer.peaNo,
-        kVA: caQoute.customer.kVA,
-        trType: caQoute.customer.trType,
-        sign: caQoute.customer.sign,
-        data
+        name: ca.name,
+        ca: ca.ca,
+        peaNo: ca.peaNo,
+        kVA: ca.kVA,
+        trType: ca.trType,
+        sign: ca.sign,
+        rank: ca.rank,
+        data,
+        qouter: qouter.qouter,
+        qouterTel: qouter.qouterTel,
+        qouterRank: qouter.qouterRank
       })
     }
     const res = await fetch('https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec',option)
@@ -347,25 +375,19 @@ export default function Home({
       new Blob([pdfBlob], { type: "application/pdf" }),
     );
 
-    //เปิด URL ของ PDF ในหน้าต่างใหม่
     window.open(pdfUrl, "_blank");
-
-    // const downloadLink = document.createElement('a');
-    // downloadLink.href = pdfUrl;
-    // downloadLink.download = 'generated_pdf.pdf';
-    // downloadLink.click();
   };
 
   const total = useMemo(() => {
     let total = 0;
     for (const pac of packages) {
-      total = total + pac.item.price;
+      total = total + (pac.item.price*(1+pac.item.profit));
     }
     for (const it of itemsAmount) {
-      total = total + it.amount * (it.item.price + it.item.labour);
+      total = total + it.amount * (it.item.price + it.item.labour)*(1+it.item.profit);
     }
     for (const it of transformerAmount) {
-      total = total + it.amount * (it.item.price + it.item.labour);
+      total = total + it.amount * (it.item.price + it.item.labour)*(1+it.item.profit);
     }
     return total;
   }, [packages, itemsAmount, forceReRender, transformerAmount]);
@@ -380,6 +402,17 @@ export default function Home({
       return array.indexOf(value) === index;
     });
   }, [transformer]);
+
+  const accessoryTypeList = useMemo(() => {
+    const accs: AccessoryItem[] = itemList;
+    let list: string[] = [];
+    for (const acc of accs) {
+      list.push(acc.subType);
+    }
+    return list.filter((value, index, array) => {
+      return array.indexOf(value) === index;
+    });
+  }, [itemList]);
 
   useEffect(()=>{
     loading(false)
@@ -474,6 +507,30 @@ export default function Home({
           onChange={(e) => setCA({ ...ca, tel: e.target.value })}
         />
       </div>
+      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
+        <span>ผู้เสนอราคา: </span>
+        <Autocomplete
+                id="combo-box-demo"
+                disablePortal
+                options={qouterlist}
+                onChange={(e,v)=>{v?setQouter(v):undefined}}
+                value={qouter}
+                sx={{
+                  fontSize: "12px",
+                  width: "300px",
+                  margin: "1rem",
+                }}
+                getOptionLabel={(option)=>option.qouter}
+                renderInput={(params) => (
+                  <TextField
+                    color="secondary"
+                    variant="standard"
+                    {...params}
+                  />
+                )}
+              />
+      </div>
+      
 
       <Chip
         sx={{ fontSize: "18px", margin: "1rem 0 0 0" }}
@@ -735,16 +792,16 @@ export default function Home({
                   />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.price} />
+                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit))} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.price * row.amount} />
+                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit) * row.amount)} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.labour} />
+                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit))} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.labour * row.amount} />
+                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit) * row.amount)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -782,28 +839,51 @@ export default function Home({
             </div>
           }
           component={
-            <Autocomplete
-              id="combo-box-demo"
-              disablePortal
-              options={itemList}
-              value={null}
-              getOptionLabel={(option) => option.name}
-              onChange={handleAutoCompleteAccessory}
-              sx={{
-                fontSize: "12px",
-                width: "300px",
-                height: "600px",
-                margin: "1rem",
-              }}
-              renderInput={(params) => (
-                <TextField
-                  color="secondary"
-                  variant="standard"
-                  {...params}
-                  label="เพิ่มรายการ"
+            <Box sx={{ height: "400px" }} className="flex flex-col">
+              <Autocomplete
+                id="combo-box-demo"
+                disablePortal
+                options={accessoryTypeList}
+                onChange={handleAutoCompleteAccessory}
+                value={accSubTypeSelection}
+                sx={{
+                  fontSize: "12px",
+                  width: "300px",
+                  margin: "1rem",
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    color="secondary"
+                    variant="standard"
+                    {...params}
+                    label="ประเภท"
+                  />
+                )}
+              />
+              {accList.length > 0 && (
+                <Autocomplete
+                  id="combo-box-demo"
+                  disablePortal
+                  options={accList}
+                  getOptionLabel={(option) => option.name}
+                  onChange={handleAutoCompleteAddAccessory}
+                  value={null}
+                  sx={{
+                    fontSize: "12px",
+                    width: "300px",
+                    margin: "1rem",
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      color="secondary"
+                      variant="standard"
+                      {...params}
+                      label="รายการ"
+                    />
+                  )}
                 />
               )}
-            />
+            </Box>
           }
         />
       </div>
@@ -880,16 +960,16 @@ export default function Home({
                   <CellChip component={row.item.unit} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.price} />
+                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit))} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.price * row.amount} />
+                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit) * row.amount)} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.labour} />
+                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit))} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.labour * row.amount} />
+                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit) * row.amount)} />
                 </TableCell>
               </TableRow>
             ))}
@@ -912,7 +992,7 @@ export default function Home({
             }}
           >
             <Typography>
-              รวมเป็นเงินทั้งสิ้น {(total*1.07).toLocaleString("th-TH")} บาท
+              รวมเป็นเงินทั้งสิ้น {convertNumToString(total*1.07)} บาท
               รวมภาษีมูลค่าเพิ่ม 7%
             </Typography>
             <Button onClick={() => caQoute && handleSave(caQoute._id)}>
@@ -960,7 +1040,7 @@ function ItemPackage({
         >
           <Typography>{standardPackage.name}</Typography>
           <Typography>
-            {standardPackage.price.toLocaleString("th-TH")} บาท
+            {convertNumToString(standardPackage.price*(1+standardPackage.profit))} บาท
           </Typography>
         </Box>
       }
@@ -1001,44 +1081,28 @@ function convertData(caQoute:CAQoute,total:number){
   let itemindex = 1
   if(caQoute.package.length != 0){
     caQoute.package.forEach((val,i)=>{
-      if(val.item.type == "standard package transformer"){
-        data = data+`${itemindex}. ค่าบริการบำรุงรักษาหม้อแปลงไฟฟ้า จำนวน 12 รายการ จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
-      }
-      else if(val.item.type == "premium package transformer"){
-        data = data+`${itemindex}. ${premiumPackageMap.get(val.item.name)} จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
-      }
-      else if(val.item.type == "thermal"){
-        data = data+`${itemindex}. ${thermalPackageMap.get(val.item.name)} จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
-      }
+      data = data+`${itemindex}. ${val.item.longName} จำนวนเงิน ${convertNumToString(val.item.price*(1+val.item.profit))} บาท\n`
       itemindex = itemindex+1
     })
   }
   if(caQoute.transformer.length != 0){
     caQoute.transformer.forEach(val=>{
-      data = data+`${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${((val.item.price+val.item.labour)*val.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      data = data+`${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price+val.item.labour)*(1+val.item.profit)*val.amount)} บาท\n`
       itemindex = itemindex+1
     })
   }
   if(caQoute.accessory.length != 0){
     data = data+`${itemindex}. ค่าอุปกรณ์ประกอบหม้อแปลงจำนวน ${caQoute.accessory.length} รายการ ดังนี้\n`
     caQoute.accessory.forEach(val=>{
-      data = data+`   -${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${((val.item.price+val.item.labour)*val.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      data = data+`   -${val.item.longName} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price+val.item.labour)*(1+val.item.profit)*val.amount)} บาท\n`
     })
   }
-  data = data + `ราคารวมทั้งสิ้น จำนวน ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
-  data = data + `ภาษีมูลค่าเพิ่ม 7% จำนวน ${(total*0.07).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
-  data = data + `ราคารวมภาษีมูลค่าเพิ่มเป็นเงิน ${(total*1.07).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท`
+  data = data + `ราคารวมทั้งสิ้น จำนวน ${convertNumToString(total)} บาท\n`
+  data = data + `ภาษีมูลค่าเพิ่ม 7% จำนวน ${convertNumToString(total*0.07)} บาท\n`
+  data = data + `ราคารวมภาษีมูลค่าเพิ่มเป็นเงิน ${convertNumToString(total*1.07)} บาท`
   return data
 }
 
-const premiumPackageMap = new Map([
-  ["Package 1","ค่าบำรุงรักษาหม้อแปลง Package 1 จำนวน 11 รายการ"],
-  ["Package 2","ค่าบำรุงรักษาหม้อแปลง Package 2 จำนวน 10 รายการ"],
-  ["Package 3","ค่าบำรุงรักษาหม้อแปลง Package 3 จำนวน 10 รายการ"],
-  ["Package 4","ค่าบำรุงรักษาหม้อแปลง Package 4 จำนวน 8 รายการ"]
-])
-
-const thermalPackageMap = new Map([
-  ["ครึ่งวันหรือ < 3.5 ช.ม.","ส่องจุดร้อนด้วยกล้องส่องความร้อน จำนวนครึ่งวัน หรือไม่เกิน 3.5 ชั่วโมง"],
-  ["ครึ่งวันหรือ < 7 ช.ม.","ส่องจุดร้อนด้วยกล้องส่องความร้อน จำนวน 1 วัน หรือไม่เกิน 7 ชั่วโมง"]
-])
+function convertNumToString(num:number){
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
