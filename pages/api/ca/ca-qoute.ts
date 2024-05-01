@@ -46,17 +46,10 @@ export default async function handler(
           return;
         }
 
-        const caQoute = {
-          customer: resultFindCA as unknown as CA,
-          package: [],
-          transformer: [],
-          accessory: [],
-        };
-
         const resultInsert = await mongoClient
           .db("digital-tr")
-          .collection("ca-qoute")
-          .insertOne(caQoute);
+          .collection("qoute")
+          .insertOne({...resultFindCA});
         if (!resultInsert.acknowledged) {
           await mongoClient.close();
           res.status(500).end();

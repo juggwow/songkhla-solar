@@ -29,7 +29,8 @@ export function MaterialProvider({ children }: { children: ReactNode }) {
         if (res.status != 200) {
           return;
         }
-        setMaterialData((await res.json()) as MaterialData);
+        const data = await res.json()
+        setMaterialData(data as MaterialData);
       };
 
       data();

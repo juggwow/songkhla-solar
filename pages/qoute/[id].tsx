@@ -3,14 +3,6 @@ import {
   Box,
   Button,
   Chip,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Menu,
-  MenuItem,
-  Radio,
-  RadioGroup,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -35,6 +27,7 @@ import {
   CA,
   CAQoute,
   Package,
+  PackageAmount,
   TransformerItem,
   TransformerItemAmount,
 } from "@/type/ca";
@@ -127,7 +120,7 @@ export default function Home({
           address: "",
         },
   );
-  const [packages, setPackages] = useState<Package[]>(
+  const [packages, setPackages] = useState<PackageAmount[]>(
     caQoute ? caQoute.package : [],
   );
   const [itemsAmount, setItemsAmount] = useState<AccessoryItemAmount[]>(
@@ -214,15 +207,15 @@ export default function Home({
   };
 
   const handleClick = (pac: Package, isSelected?: boolean) => {
-    let p: Package[] = [];
+    let p: PackageAmount[] = [];
     if (!isSelected) {
       p = packages.filter((val) => {
-        return val.type != pac.type;
+        return val.item.type != pac.type;
       });
-      setPackages([...p, pac]);
+      setPackages([...p, {item:pac,amount:1}]);
     } else {
       p = packages.filter((val) => {
-        return val.name != pac.name;
+        return val.item.name != pac.name;
       });
       setPackages(p);
     }
@@ -361,7 +354,7 @@ export default function Home({
   const total = useMemo(() => {
     let total = 0;
     for (const pac of packages) {
-      total = total + pac.price;
+      total = total + pac.item.price;
     }
     for (const it of itemsAmount) {
       total = total + it.amount * (it.item.price + it.item.labour);
@@ -381,7 +374,7 @@ export default function Home({
     return list.filter((value, index, array) => {
       return array.indexOf(value) === index;
     });
-  }, []);
+  }, [transformer]);
 
   useEffect(()=>{
     loading(false)
@@ -940,10 +933,10 @@ function CellChip({ component }: { component: any }) {
   );
 }
 
-function hasSelected(pacs: Package[], pac: Package): boolean {
+function hasSelected(pacs: PackageAmount[], pac: Package): boolean {
   let packages: string[] = [];
   for (const p of pacs) {
-    packages.push(p._id);
+    packages.push(p.item._id);
   }
   return packages.includes(pac._id);
 }
@@ -953,14 +946,14 @@ function convertData(caQoute:CAQoute,total:number){
   let itemindex = 1
   if(caQoute.package.length != 0){
     caQoute.package.forEach((val,i)=>{
-      if(val.type == "standard package transformer"){
-        data = data+`${itemindex}. ค่าบริการบำรุงรักษาหม้อแปลงไฟฟ้า จำนวน 12 รายการ จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      if(val.item.type == "standard package transformer"){
+        data = data+`${itemindex}. ค่าบริการบำรุงรักษาหม้อแปลงไฟฟ้า จำนวน 12 รายการ จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
       }
-      else if(val.type == "premium package transformer"){
-        data = data+`${itemindex}. ${premiumPackageMap.get(val.name)} จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      else if(val.item.type == "premium package transformer"){
+        data = data+`${itemindex}. ${premiumPackageMap.get(val.item.name)} จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
       }
-      else if(val.type == "thermal"){
-        data = data+`${itemindex}. ${thermalPackageMap.get(val.name)} จำนวนเงิน ${val.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
+      else if(val.item.type == "thermal"){
+        data = data+`${itemindex}. ${thermalPackageMap.get(val.item.name)} จำนวนเงิน ${val.item.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} บาท\n`
       }
       itemindex = itemindex+1
     })

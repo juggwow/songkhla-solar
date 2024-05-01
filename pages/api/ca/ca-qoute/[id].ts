@@ -29,8 +29,8 @@ export default async function handler(
 
   const mongoClient = await clientPromise;
   await mongoClient.connect();
-  const collection = mongoClient.db("digital-tr").collection("ca-qoute");
-
+  const qouteItemsColl = mongoClient.db("digital-tr").collection("qoute-items")
+  const qouteColl = mongoClient.db("digital-tr").collection("qoute")
   try {
     switch (req.method) {
       case "GET": {
@@ -57,28 +57,76 @@ export default async function handler(
         return;
       }
       case "PATCH": {
-        const update = req.body;
-        const resultUpdate = await collection.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: update },
-        );
-        if (!resultUpdate.acknowledged) {
+        const update:CAQoute = req.body;
+        const resultUpdateQoute = await qouteColl.updateOne({
+          _id: new ObjectId(id)
+        },{
+          $set: update.customer
+        })
+        if (!resultUpdateQoute.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
           return;
+        }
+        const resultDeleteItems = await qouteItemsColl.deleteMany({
+          qoute_id : new ObjectId(id)
+        })
+        if(!resultDeleteItems.acknowledged){
+          await mongoClient.close();
+          res.status(404).end();
+          return
+        }
+
+        let objInsert = []
+        for (const item of update.package){
+          objInsert.push({
+            qoute_id: new ObjectId(id),
+            item_id: item.item._id,
+            amount: item.amount
+          })
+        }
+        for (const item of update.transformer){
+          objInsert.push({
+            qoute_id: new ObjectId(id),
+            item_id: item.item._id,
+            amount: item.amount
+          })
+        }
+        for (const item of update.accessory){
+          objInsert.push({
+            qoute_id: new ObjectId(id),
+            item_id: item.item._id,
+            amount: item.amount
+          })
+        }
+        
+        const resultInsertItems = await qouteItemsColl.insertMany(objInsert)
+        if(!resultInsertItems.acknowledged){
+          await mongoClient.close();
+          res.status(404).end();
+          return
         }
 
         res.status(200).end();
         return;
       }
       case "DELETE": {
-        const resulteDel = await collection.deleteOne({
-          _id: new ObjectId(id),
-        });
-        if (!resulteDel.acknowledged) {
+        const resultDeleteItems = await qouteItemsColl.deleteMany({
+          qoute_id : new ObjectId(id)
+        })
+        if(!resultDeleteItems.acknowledged){
           await mongoClient.close();
-          res.status(500).end();
-          return;
+          res.status(404).end();
+          return
+        }
+
+        const resultDeleteQoute = await qouteColl.deleteOne({
+          _id : new ObjectId(id)
+        })
+        if(!resultDeleteQoute.acknowledged){
+          await mongoClient.close();
+          res.status(404).end();
+          return
         }
 
         await mongoClient.close();

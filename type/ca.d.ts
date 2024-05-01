@@ -50,10 +50,15 @@ export type TransformerItemAmount = {
   amount: number;
 };
 
+export type PackageAmount = {
+  item : Package;
+  amount: number
+}
+
 export type CAQoute = {
   _id: string;
   customer: CA;
-  package: Package[];
+  package: PackageAmount[];
   accessory: AccessoryItemAmount[];
   transformer: TransformerItemAmount[];
 };
