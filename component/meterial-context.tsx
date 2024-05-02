@@ -15,7 +15,7 @@ const noMaterialData = {
   premuimPackage: [],
   standardPackage: [],
   transformer: [],
-  qouterlist: []
+  qouterlist: [],
 };
 const MaterialContext = createContext<MaterialData>(noMaterialData);
 
@@ -30,7 +30,7 @@ export function MaterialProvider({ children }: { children: ReactNode }) {
         if (res.status != 200) {
           return;
         }
-        const data = await res.json()
+        const data = await res.json();
         setMaterialData(data as MaterialData);
       };
 

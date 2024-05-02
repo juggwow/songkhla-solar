@@ -7,7 +7,14 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { CA, CAWithQouteCount, TableCA } from "@/type/ca";
-import { Button, Pagination, TablePagination, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  Pagination,
+  TablePagination,
+  Typography,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { useState, useEffect } from "react";
@@ -51,7 +58,145 @@ export default function CATable({
   rowsPerPage: number;
 }) {
   return (
-    <TableContainer className="mt-3">
+    <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
+      <Table
+        sx={{ width: 1100, border: "none" }}
+        size="small"
+        aria-label="a dense table"
+      >
+        <TableHead>
+          <TableRow>
+            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+              <CellChip color="success" component={"Action"} />
+            </TableCell>
+            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+              <CellChip color="success" component={"หมายเลขผู้ใช้ไฟ"} />
+            </TableCell>
+            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+              <CellChip color="success" component={"หมายเลขมิเตอร์"} />
+            </TableCell>
+            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+              <CellChip color="success" component={"ชื่อผู้ใช้ไฟ"} />
+            </TableCell>
+            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+              <CellChip color="success" component={"ที่อยู่"} />
+            </TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {cas.map((row, i) => (
+            <TableRow sx={{ margin: "0.5rem 0 0 0" }} key={i}>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip
+                  color={i % 2 == 0 ? "primary" : "warning"}
+                  component={
+                    <Box>
+                      {row.quoteCount > 0 && (
+                        <Button
+                          sx={{ width: 30 }}
+                          onClick={() => handleSearchQoute(row.ca)}
+                        >
+                          <SearchIcon color="secondary" />
+                        </Button>
+                      )}
+                      <Button
+                        sx={{ width: 30 }}
+                        color="secondary"
+                        onClick={() => handleCreateQoute(row.ca)}
+                      >
+                        <AddCircleOutlineIcon color="secondary" />
+                      </Button>
+                    </Box>
+                  }
+                />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip
+                  color={i % 2 == 0 ? "primary" : "warning"}
+                  component={
+                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                      {row.ca}
+                    </Typography>
+                  }
+                />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
+                <CellChip
+                  color={i % 2 == 0 ? "primary" : "warning"}
+                  component={
+                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                      {row.meter}
+                    </Typography>
+                  }
+                />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 300, padding: "0" }}>
+                <CellChip
+                  color={i % 2 == 0 ? "primary" : "warning"}
+                  component={
+                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                      {row.name}
+                    </Typography>
+                  }
+                />
+              </TableCell>
+              <TableCell sx={{ border: "none", width: 500, padding: "0" }}>
+                <CellChip
+                  color={i % 2 == 0 ? "primary" : "warning"}
+                  component={
+                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
+                      {row.address}
+                    </Typography>
+                  }
+                />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <TablePagination
+        component="div"
+        count={count}
+        page={page}
+        onPageChange={(e, v) => onPageChange(v)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
+      />
+    </TableContainer>
+  );
+}
+
+function CellChip({
+  component,
+  color,
+}: {
+  component: any;
+  color?:
+    | "default"
+    | "primary"
+    | "secondary"
+    | "error"
+    | "info"
+    | "success"
+    | "warning";
+}) {
+  return (
+    <Chip
+      sx={{
+        width: "98%",
+        fontSize: "12px",
+        height: 60,
+        margin: "0.5rem 0 0 0",
+      }}
+      label={component}
+      clickable={false}
+      color={color ? color : "primary"}
+    />
+  );
+}
+
+{
+  /* <TableContainer className="mt-3">
       <Table sx={{ minWidth: 700 }} aria-label="customized table">
         <TableHead>
           <TableRow>
@@ -100,6 +245,5 @@ export default function CATable({
         rowsPerPage={rowsPerPage}
         onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
       />
-    </TableContainer>
-  );
+    </TableContainer> */
 }

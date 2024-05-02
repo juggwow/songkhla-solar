@@ -6,11 +6,13 @@ export type CA = {
   peaNo?: string;
   kVA?: string;
   trType?: string;
-  sign?: string
-  rank?: string
+  sign?: string;
+  rank?: string;
 };
 
-export type CAWithQouteCount = CA & {
+export type SearchCA = Pick<CA, "ca" | "name" | "address"> & { meter: string };
+
+export type CAWithQouteCount = SearchCA & {
   quoteCount: number;
 };
 
@@ -37,7 +39,7 @@ export type AccessoryItem = {
   labour: number;
   subType: string;
   longName: string;
-  profit: number
+  profit: number;
 };
 
 export type TransformerItem = {
@@ -62,9 +64,9 @@ export type TransformerItemAmount = {
 };
 
 export type PackageAmount = {
-  item : Package;
-  amount: number
-}
+  item: Package;
+  amount: number;
+};
 
 export type CAQoute = {
   _id: string;
@@ -78,7 +80,7 @@ export type Qouter = {
   qouter: string;
   qouterRank: string;
   qouterTel: string;
-}
+};
 
 export type MaterialData = {
   itemList: AccessoryItem[];

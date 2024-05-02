@@ -1,5 +1,5 @@
 import clientPromise from "@/lib/mongodb";
-import { CA, CAWithQouteCount, TableCA } from "@/type/ca";
+import { CA, CAWithQouteCount, SearchCA, TableCA } from "@/type/ca";
 import { ObjectId } from "mongodb";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
@@ -24,7 +24,8 @@ export default async function handler(
     res.status(404).end();
     return;
   }
-  const { searchCA, tableCA }: { searchCA: CA; tableCA: TableCA } = req.body;
+  const { searchCA, tableCA }: { searchCA: SearchCA; tableCA: TableCA } =
+    req.body;
   const mongoClient = await clientPromise;
   await mongoClient.connect();
 
@@ -35,6 +36,7 @@ export default async function handler(
           ca: { $ne: "", $regex: searchCA.ca },
           name: { $ne: "", $regex: searchCA.name },
           address: { $regex: searchCA.address },
+          meter: { $regex: searchCA.meter },
         },
       },
       {
@@ -44,6 +46,7 @@ export default async function handler(
           name: 1,
           address: 1,
           quoteCount: 1,
+          meter: 1,
         },
       },
       {
@@ -67,6 +70,7 @@ export default async function handler(
           address: {
             $regex: searchCA.address,
           },
+          meter: { $regex: searchCA.meter },
         },
       },
       {

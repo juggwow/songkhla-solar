@@ -49,7 +49,7 @@ export default async function handler(
         const resultInsert = await mongoClient
           .db("digital-tr")
           .collection("qoute")
-          .insertOne({...resultFindCA});
+          .insertOne({ ...resultFindCA });
         if (!resultInsert.acknowledged) {
           await mongoClient.close();
           res.status(500).end();

@@ -1,10 +1,12 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { useEffect } from "react";
+import { Box, Button, Divider, TextField, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import { CAQoute, CAWithQouteCount } from "@/type/ca";
 import CATable from "@/component/ca-table";
 import { useRouter } from "next/router";
 import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
 import { useAlertLoading } from "@/component/alert-loading";
+import QouteTable from "@/component/qoute-table";
+import GroupSizesColors from "@/component/switch";
 
 export default function Home() {
   const router = useRouter();
@@ -23,6 +25,8 @@ export default function Home() {
 
   const { loading, alert } = useAlertLoading();
 
+  const [bottonSw, setBottonSw] = useState<"right" | "left">("right");
+
   const handleSearchQoute = async (ca: string) => {
     const res = await fetch(`/api/ca/ca-qoute/${ca}`);
     if (res.status != 200) {
@@ -30,6 +34,7 @@ export default function Home() {
       return;
     }
     setShowCAQoutes((await res.json()) as CAQoute[]);
+    setBottonSw("left");
   };
 
   const handleCreateQoute = async (ca: string) => {
@@ -68,13 +73,14 @@ export default function Home() {
         await res.json();
       setCAs(cas);
       setCountCA(count.count);
+      setBottonSw("right");
     }
   };
 
-  const handleEditQoute =async (id:string)=>{
-    loading(true)
-    router.push(`qoute/${id}`)  
-  }
+  const handleEditQoute = async (id: string) => {
+    loading(true);
+    router.push(`qoute/${id}`);
+  };
 
   const handleDelete = async (id: string) => {
     loading(true);
@@ -100,64 +106,82 @@ export default function Home() {
     <div className="p-3 flex flex-col">
       <Typography>ค้นหาผู้ใช้ไฟ</Typography>
 
-      <TextField
-        onChange={(e) => setSearchCA({ ...searchCA, ca: e.target.value })}
-        id="ca"
-        label="ca"
-        className="mt-3"
-        sx={{ width: "200px" }}
-      />
-      <TextField
-        onChange={(e) => setSearchCA({ ...searchCA, name: e.target.value })}
-        id="name"
-        label="ชื่อ สกุล"
-        className="mt-3"
-        sx={{ width: "200px" }}
-      />
-      <TextField
-        onChange={(e) => setSearchCA({ ...searchCA, address: e.target.value })}
-        id="address"
-        label="ที่อยู่"
-        className="mt-3"
-        sx={{ width: "200px" }}
-      />
-
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          flexWrap: "wrap",
+          gap: "1rem",
+        }}
+      >
+        <TextField
+          color="warning"
+          onChange={(e) => setSearchCA({ ...searchCA, ca: e.target.value })}
+          id="ca"
+          label="ca"
+          sx={{ width: "300px" }}
+        />
+        <TextField
+          onChange={(e) => setSearchCA({ ...searchCA, name: e.target.value })}
+          id="name"
+          label="ชื่อ สกุล"
+          sx={{ width: "300px" }}
+        />
+        <TextField
+          onChange={(e) => setSearchCA({ ...searchCA, meter: e.target.value })}
+          color="info"
+          id="address"
+          label="หมายเลขมิเตอร์"
+          sx={{ width: "300px" }}
+        />
+        <TextField
+          onChange={(e) =>
+            setSearchCA({ ...searchCA, address: e.target.value })
+          }
+          color="secondary"
+          id="address"
+          label="ที่อยู่"
+          sx={{ width: "300px" }}
+        />
+      </Box>
       <Button
-        sx={{ width: "200px" }}
-        className="mt-3"
+        sx={{ width: "300px", margin: "1rem 0" }}
         variant="outlined"
+        color="secondary"
         onClick={() => handleSearchCAs()}
       >
         ค้นหา
       </Button>
 
-      <CATable
-        onPageChange={(p) => setTableCA({ ...tableCA, page: p })}
-        onRowsPerPageChange={(r) => setTableCA({ ...tableCA, rowsPerPage: r })}
-        rowsPerPage={tableCA.rowsPerPage}
-        page={tableCA.page}
-        cas={cas}
-        count={countCA}
-        handleSearchQoute={handleSearchQoute}
-        handleCreateQoute={handleCreateQoute}
+      <Divider />
+
+      <GroupSizesColors
+        onClick={(l) => setBottonSw(l)}
+        leftText={"ใบเสนอราคา"}
+        rightText={"รายชื่อผู้ใช้ไฟ"}
       />
 
-      {showCAQoutes.map((val) => {
-        return (
-          <Box key={val._id}>
-            <Typography>{val.customer.name}</Typography>
-            <Typography>จำนวนรายการ package: {val.package.length}</Typography>
-            <Typography>
-              จำนวนรายการหม้อแปลง : {val.transformer.length}
-            </Typography>
-            <Typography>จำนวนรายการ accessory: {val.package.length}</Typography>
-            <Button onClick={()=>handleEditQoute(val._id)}>
-              แก้ไข
-            </Button>
-            <Button onClick={() => handleDelete(val._id)}>ลบ</Button>
-          </Box>
-        );
-      })}
+      {bottonSw == "right" && (
+        <CATable
+          onPageChange={(p) => setTableCA({ ...tableCA, page: p })}
+          onRowsPerPageChange={(r) =>
+            setTableCA({ ...tableCA, rowsPerPage: r })
+          }
+          rowsPerPage={tableCA.rowsPerPage}
+          page={tableCA.page}
+          cas={cas}
+          count={countCA}
+          handleSearchQoute={handleSearchQoute}
+          handleCreateQoute={handleCreateQoute}
+        />
+      )}
+      {bottonSw == "left" && (
+        <QouteTable
+          showCAQoutes={showCAQoutes}
+          handleEditQoute={handleEditQoute}
+          handleDelete={handleDelete}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { CA, TableCA, CAWithQouteCount, CAQoute } from "@/type/ca";
+import { CA, TableCA, CAWithQouteCount, CAQoute, SearchCA } from "@/type/ca";
 import {
   Dispatch,
   ReactNode,
@@ -10,8 +10,8 @@ import {
 } from "react";
 
 type ContextType = {
-  searchCA: CA;
-  setSearchCA: Dispatch<SetStateAction<CA>>;
+  searchCA: SearchCA;
+  setSearchCA: Dispatch<SetStateAction<SearchCA>>;
   tableCA: TableCA;
   setTableCA: Dispatch<SetStateAction<TableCA>>;
   cas: CAWithQouteCount[];
@@ -26,10 +26,11 @@ type ContextType = {
 const SearchCAQouteContext = createContext<ContextType | undefined>(undefined);
 
 export function SearchCAQouteProvider({ children }: { children: ReactNode }) {
-  const [searchCA, setSearchCA] = useState<CA>({
+  const [searchCA, setSearchCA] = useState<SearchCA>({
     ca: "",
     name: "",
     address: "",
+    meter: "",
   });
   const [tableCA, setTableCA] = useState<TableCA>({
     rowsPerPage: 10,
@@ -43,6 +44,7 @@ export function SearchCAQouteProvider({ children }: { children: ReactNode }) {
       ca: "",
       name: "",
       address: "",
+      meter: "",
     });
     setTableCA({
       rowsPerPage: 10,

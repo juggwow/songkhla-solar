@@ -29,8 +29,8 @@ export default async function handler(
 
   const mongoClient = await clientPromise;
   await mongoClient.connect();
-  const qouteItemsColl = mongoClient.db("digital-tr").collection("qoute-items")
-  const qouteColl = mongoClient.db("digital-tr").collection("qoute")
+  const qouteItemsColl = mongoClient.db("digital-tr").collection("qoute-items");
+  const qouteColl = mongoClient.db("digital-tr").collection("qoute");
   try {
     switch (req.method) {
       case "GET": {
@@ -57,54 +57,57 @@ export default async function handler(
         return;
       }
       case "PATCH": {
-        const update:CAQoute = req.body;
-        const resultUpdateQoute = await qouteColl.updateOne({
-          _id: new ObjectId(id)
-        },{
-          $set: update.customer
-        })
+        const update: CAQoute = req.body;
+        const resultUpdateQoute = await qouteColl.updateOne(
+          {
+            _id: new ObjectId(id),
+          },
+          {
+            $set: update.customer,
+          },
+        );
         if (!resultUpdateQoute.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
           return;
         }
         const resultDeleteItems = await qouteItemsColl.deleteMany({
-          qoute_id : new ObjectId(id)
-        })
-        if(!resultDeleteItems.acknowledged){
+          qoute_id: new ObjectId(id),
+        });
+        if (!resultDeleteItems.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
-          return
+          return;
         }
 
-        let objInsert = []
-        for (const item of update.package){
+        let objInsert = [];
+        for (const item of update.package) {
           objInsert.push({
             qoute_id: new ObjectId(id),
             item_id: item.item._id,
-            amount: item.amount
-          })
+            amount: item.amount,
+          });
         }
-        for (const item of update.transformer){
+        for (const item of update.transformer) {
           objInsert.push({
             qoute_id: new ObjectId(id),
             item_id: item.item._id,
-            amount: item.amount
-          })
+            amount: item.amount,
+          });
         }
-        for (const item of update.accessory){
+        for (const item of update.accessory) {
           objInsert.push({
             qoute_id: new ObjectId(id),
             item_id: item.item._id,
-            amount: item.amount
-          })
+            amount: item.amount,
+          });
         }
-        
-        const resultInsertItems = await qouteItemsColl.insertMany(objInsert)
-        if(!resultInsertItems.acknowledged){
+
+        const resultInsertItems = await qouteItemsColl.insertMany(objInsert);
+        if (!resultInsertItems.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
-          return
+          return;
         }
 
         res.status(200).end();
@@ -112,21 +115,21 @@ export default async function handler(
       }
       case "DELETE": {
         const resultDeleteItems = await qouteItemsColl.deleteMany({
-          qoute_id : new ObjectId(id)
-        })
-        if(!resultDeleteItems.acknowledged){
+          qoute_id: new ObjectId(id),
+        });
+        if (!resultDeleteItems.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
-          return
+          return;
         }
 
         const resultDeleteQoute = await qouteColl.deleteOne({
-          _id : new ObjectId(id)
-        })
-        if(!resultDeleteQoute.acknowledged){
+          _id: new ObjectId(id),
+        });
+        if (!resultDeleteQoute.acknowledged) {
           await mongoClient.close();
           res.status(404).end();
-          return
+          return;
         }
 
         await mongoClient.close();

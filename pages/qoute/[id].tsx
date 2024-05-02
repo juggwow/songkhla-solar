@@ -39,6 +39,7 @@ import { ObjectId } from "mongodb";
 import { useMaterial } from "@/component/meterial-context";
 import { useSearchCAQoute } from "@/component/search-ca-qoute-context";
 import { useAlertLoading } from "@/component/alert-loading";
+import { convertNumToString } from "@/lib/util";
 
 export const getServerSideProps = (async (context) => {
   const propsnull = {
@@ -104,7 +105,7 @@ export default function Home({
     premuimPackage,
     standardPackage,
     transformer,
-    qouterlist
+    qouterlist,
   } = useMaterial();
 
   const { alert, loading } = useAlertLoading();
@@ -123,7 +124,7 @@ export default function Home({
           kVA: "",
           trType: "",
           sign: "",
-          rank: ""
+          rank: "",
         },
   );
   const [packages, setPackages] = useState<PackageAmount[]>(
@@ -138,14 +139,16 @@ export default function Home({
   const [forceReRender, setForceReRender] = useState(false);
   const [addAccessory, setAddAccessory] = useState(false);
   const [trList, setTrList] = useState<TransformerItem[]>([]);
-  const [accList,setAccList] = useState<AccessoryItem[]>([])
-  const [accSubTypeSelection,setAccSubTypeSelection] = useState<string|null>(null)
+  const [accList, setAccList] = useState<AccessoryItem[]>([]);
+  const [accSubTypeSelection, setAccSubTypeSelection] = useState<string | null>(
+    null,
+  );
   const [trSizeSelection, setTrSizeSelection] = useState<string | null>(null);
-  const [qouter,setQouter] = useState<Qouter>({
+  const [qouter, setQouter] = useState<Qouter>({
     qouter: "",
     qouterRank: "",
-    qouterTel: ""
-  })
+    qouterTel: "",
+  });
 
   const handleAutoCompleteTr = (
     e: React.SyntheticEvent<Element, Event>,
@@ -210,7 +213,7 @@ export default function Home({
     });
     setAccList(accslist);
   };
-  
+
   const handleAutoCompleteAddAccessory = (
     e: React.SyntheticEvent<Element, Event> | null,
     v: AccessoryItem | null,
@@ -241,7 +244,7 @@ export default function Home({
       p = packages.filter((val) => {
         return val.item.type != pac.type;
       });
-      setPackages([...p, {item:pac,amount:1}]);
+      setPackages([...p, { item: pac, amount: 1 }]);
     } else {
       p = packages.filter((val) => {
         return val.item.name != pac.name;
@@ -336,14 +339,14 @@ export default function Home({
       return;
     }
     loading(true);
-    const thisQoute:CAQoute = {
+    const thisQoute: CAQoute = {
       _id: caQoute._id,
       customer: ca,
       package: packages,
       accessory: itemsAmount,
-      transformer: transformerAmount 
-    }
-    const data = convertData(thisQoute,total) 
+      transformer: transformerAmount,
+    };
+    const data = convertData(thisQoute, total);
     const option = {
       method: "POST",
       body: JSON.stringify({
@@ -357,11 +360,14 @@ export default function Home({
         data,
         qouter: qouter.qouter,
         qouterTel: qouter.qouterTel,
-        qouterRank: qouter.qouterRank
-      })
-    }
-    const res = await fetch('https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec',option)
-    const {msg} = await res.json()
+        qouterRank: qouter.qouterRank,
+      }),
+    };
+    const res = await fetch(
+      "https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec",
+      option,
+    );
+    const { msg } = await res.json();
     loading(false);
     if (msg == "error") {
       alert("ไม่สามารถ Download เอกสารได้ กรุณาลองใหม่อีกครั้ง", "error");
@@ -381,13 +387,17 @@ export default function Home({
   const total = useMemo(() => {
     let total = 0;
     for (const pac of packages) {
-      total = total + (pac.item.price*(1+pac.item.profit));
+      total = total + pac.item.price * (1 + pac.item.profit);
     }
     for (const it of itemsAmount) {
-      total = total + it.amount * (it.item.price + it.item.labour)*(1+it.item.profit);
+      total =
+        total +
+        it.amount * (it.item.price + it.item.labour) * (1 + it.item.profit);
     }
     for (const it of transformerAmount) {
-      total = total + it.amount * (it.item.price + it.item.labour)*(1+it.item.profit);
+      total =
+        total +
+        it.amount * (it.item.price + it.item.labour) * (1 + it.item.profit);
     }
     return total;
   }, [packages, itemsAmount, forceReRender, transformerAmount]);
@@ -414,9 +424,9 @@ export default function Home({
     });
   }, [itemList]);
 
-  useEffect(()=>{
-    loading(false)
-  },[])
+  useEffect(() => {
+    loading(false);
+  }, []);
 
   return (
     <div className="p-3">
@@ -510,27 +520,24 @@ export default function Home({
       <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
         <span>ผู้เสนอราคา: </span>
         <Autocomplete
-                id="combo-box-demo"
-                disablePortal
-                options={qouterlist}
-                onChange={(e,v)=>{v?setQouter(v):undefined}}
-                value={qouter}
-                sx={{
-                  fontSize: "12px",
-                  width: "300px",
-                  margin: "1rem",
-                }}
-                getOptionLabel={(option)=>option.qouter}
-                renderInput={(params) => (
-                  <TextField
-                    color="secondary"
-                    variant="standard"
-                    {...params}
-                  />
-                )}
-              />
+          id="combo-box-demo"
+          disablePortal
+          options={qouterlist}
+          onChange={(e, v) => {
+            v ? setQouter(v) : undefined;
+          }}
+          value={qouter}
+          sx={{
+            fontSize: "12px",
+            width: "300px",
+            margin: "1rem",
+          }}
+          getOptionLabel={(option) => option.qouter}
+          renderInput={(params) => (
+            <TextField color="secondary" variant="standard" {...params} />
+          )}
+        />
       </div>
-      
 
       <Chip
         sx={{ fontSize: "18px", margin: "1rem 0 0 0" }}
@@ -792,16 +799,32 @@ export default function Home({
                   />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit))} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.price * (1 + row.item.profit),
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit) * row.amount)} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.price * (1 + row.item.profit) * row.amount,
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit))} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.labour * (1 + row.item.profit),
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit) * row.amount)} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.labour * (1 + row.item.profit) * row.amount,
+                    )}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -960,16 +983,32 @@ export default function Home({
                   <CellChip component={row.item.unit} />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit))} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.price * (1 + row.item.profit),
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.price * (1+row.item.profit) * row.amount)} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.price * (1 + row.item.profit) * row.amount,
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit))} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.labour * (1 + row.item.profit),
+                    )}
+                  />
                 </TableCell>
                 <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={convertNumToString(row.item.labour * (1+row.item.profit) * row.amount)} />
+                  <CellChip
+                    component={convertNumToString(
+                      row.item.labour * (1 + row.item.profit) * row.amount,
+                    )}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -989,21 +1028,24 @@ export default function Home({
               display: "flex",
               flexDirection: "row",
               alignItems: "center",
+              flexWrap:"wrap"
             }}
           >
             <Typography>
-              รวมเป็นเงินทั้งสิ้น {convertNumToString(total*1.07)} บาท
+              รวมเป็นเงินทั้งสิ้น {convertNumToString(total * 1.07)} บาท
               รวมภาษีมูลค่าเพิ่ม 7%
             </Typography>
-            <Button onClick={() => caQoute && handleSave(caQoute._id)}>
-              <SaveIcon />
-            </Button>
-            <Button onClick={() => caQoute && handleDelete(caQoute._id)}>
-              <DeleteIcon />
-            </Button>
-            <Button onClick={() => handleDownload(caQoute)}>
-              <PrintIcon />
-            </Button>
+            <Box>
+              <Button onClick={() => caQoute && handleSave(caQoute._id)}>
+                <SaveIcon />
+              </Button>
+              <Button onClick={() => caQoute && handleDelete(caQoute._id)}>
+                <DeleteIcon />
+              </Button>
+              <Button onClick={() => handleDownload(caQoute)}>
+                <PrintIcon />
+              </Button>
+            </Box>
           </Box>
         }
         color="info"
@@ -1040,7 +1082,10 @@ function ItemPackage({
         >
           <Typography>{standardPackage.name}</Typography>
           <Typography>
-            {convertNumToString(standardPackage.price*(1+standardPackage.profit))} บาท
+            {convertNumToString(
+              standardPackage.price * (1 + standardPackage.profit),
+            )}{" "}
+            บาท
           </Typography>
         </Box>
       }
@@ -1076,33 +1121,40 @@ function hasSelected(pacs: PackageAmount[], pac: Package): boolean {
   return packages.includes(pac._id);
 }
 
-function convertData(caQoute:CAQoute,total:number){
-  let data = ""
-  let itemindex = 1
-  if(caQoute.package.length != 0){
-    caQoute.package.forEach((val,i)=>{
-      data = data+`${itemindex}. ${val.item.longName} จำนวนเงิน ${convertNumToString(val.item.price*(1+val.item.profit))} บาท\n`
-      itemindex = itemindex+1
-    })
+function convertData(caQoute: CAQoute, total: number) {
+  let data = "";
+  let itemindex = 1;
+  if (caQoute.package.length != 0) {
+    caQoute.package.forEach((val, i) => {
+      data =
+        data +
+        `${itemindex}. ${val.item.longName} จำนวนเงิน ${convertNumToString(val.item.price * (1 + val.item.profit))} บาท\n`;
+      itemindex = itemindex + 1;
+    });
   }
-  if(caQoute.transformer.length != 0){
-    caQoute.transformer.forEach(val=>{
-      data = data+`${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price+val.item.labour)*(1+val.item.profit)*val.amount)} บาท\n`
-      itemindex = itemindex+1
-    })
+  if (caQoute.transformer.length != 0) {
+    caQoute.transformer.forEach((val) => {
+      data =
+        data +
+        `${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price + val.item.labour) * (1 + val.item.profit) * val.amount)} บาท\n`;
+      itemindex = itemindex + 1;
+    });
   }
-  if(caQoute.accessory.length != 0){
-    data = data+`${itemindex}. ค่าอุปกรณ์ประกอบหม้อแปลงจำนวน ${caQoute.accessory.length} รายการ ดังนี้\n`
-    caQoute.accessory.forEach(val=>{
-      data = data+`   -${val.item.longName} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price+val.item.labour)*(1+val.item.profit)*val.amount)} บาท\n`
-    })
+  if (caQoute.accessory.length != 0) {
+    data =
+      data +
+      `${itemindex}. ค่าอุปกรณ์ประกอบหม้อแปลงจำนวน ${caQoute.accessory.length} รายการ ดังนี้\n`;
+    caQoute.accessory.forEach((val) => {
+      data =
+        data +
+        `   -${val.item.longName} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price + val.item.labour) * (1 + val.item.profit) * val.amount)} บาท\n`;
+    });
   }
-  data = data + `ราคารวมทั้งสิ้น จำนวน ${convertNumToString(total)} บาท\n`
-  data = data + `ภาษีมูลค่าเพิ่ม 7% จำนวน ${convertNumToString(total*0.07)} บาท\n`
-  data = data + `ราคารวมภาษีมูลค่าเพิ่มเป็นเงิน ${convertNumToString(total*1.07)} บาท`
-  return data
-}
-
-function convertNumToString(num:number){
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  data = data + `ราคารวมทั้งสิ้น จำนวน ${convertNumToString(total)} บาท\n`;
+  data =
+    data + `ภาษีมูลค่าเพิ่ม 7% จำนวน ${convertNumToString(total * 0.07)} บาท\n`;
+  data =
+    data +
+    `ราคารวมภาษีมูลค่าเพิ่มเป็นเงิน ${convertNumToString(total * 1.07)} บาท`;
+  return data;
 }
