@@ -83,7 +83,7 @@ export const getServerSideProps = (async (context) => {
           transformer: 1,
           accessory: 1,
         },
-      },
+      }
     );
     if (!resultFindCAQoute) {
       await mongoClient.close();
@@ -133,13 +133,13 @@ export default function Home({
           trType: "",
           sign: "",
           rank: "",
-        },
+        }
   );
   const [packages, setPackages] = useState<PackageAmount[]>(
-    caQoute ? caQoute.package : [],
+    caQoute ? caQoute.package : []
   );
   const [itemsAmount, setItemsAmount] = useState<AccessoryItemAmount[]>(
-    caQoute ? caQoute.accessory : [],
+    caQoute ? caQoute.accessory : []
   );
   const [transformerAmount, setTransformerAmount] = useState<
     TransformerItemAmount[]
@@ -149,7 +149,7 @@ export default function Home({
   const [trList, setTrList] = useState<TransformerItem[]>([]);
   const [accList, setAccList] = useState<AccessoryItem[]>([]);
   const [accSubTypeSelection, setAccSubTypeSelection] = useState<string | null>(
-    null,
+    null
   );
   const [trSizeSelection, setTrSizeSelection] = useState<string | null>(null);
   const [qouter, setQouter] = useState<Qouter>({
@@ -161,7 +161,7 @@ export default function Home({
 
   const handleAutoCompleteTr = (
     e: React.SyntheticEvent<Element, Event>,
-    v: string | null,
+    v: string | null
   ) => {
     setTrSizeSelection(v);
     if (!v) {
@@ -177,7 +177,7 @@ export default function Home({
 
   const handleAutoCompleteAddTr = (
     e: React.SyntheticEvent<Element, Event>,
-    v: TransformerItem | null,
+    v: TransformerItem | null
   ) => {
     if (!v) {
       setAddAccessory(!addAccessory);
@@ -196,7 +196,9 @@ export default function Home({
         setTimeout(() => {
           document
             .getElementById(
-              `cell-${tr.item.name}-${tr.item.type == "transformer" && tr.item.product}`,
+              `cell-${tr.item.name}-${
+                tr.item.type == "transformer" && tr.item.product
+              }`
             )
             ?.classList.remove("shake");
         }, 1000);
@@ -209,7 +211,7 @@ export default function Home({
 
   const handleAutoCompleteAccessory = (
     e: React.SyntheticEvent<Element, Event>,
-    v: string | null,
+    v: string | null
   ) => {
     setAccSubTypeSelection(v);
     if (!v) {
@@ -225,7 +227,7 @@ export default function Home({
 
   const handleAutoCompleteAddAccessory = (
     e: React.SyntheticEvent<Element, Event> | null,
-    v: AccessoryItem | null,
+    v: AccessoryItem | null
   ) => {
     if (!v) {
       setAddAccessory(!addAccessory);
@@ -374,7 +376,7 @@ export default function Home({
     };
     const res = await fetch(
       "https://script.google.com/macros/s/AKfycbyBoN5ygzqqkcGqCUsKIna5onxqLXW-Yb0Wm1MaRkdSLGtok0nCH_lqRyCRCP4dQKk1/exec",
-      option,
+      option
     );
     const { msg } = await res.json();
     loading(false);
@@ -387,7 +389,7 @@ export default function Home({
     alert("Download สำเร็จ", "success");
     const pdfBlob = Buffer.from(msg as string, "base64");
     const pdfUrl = URL.createObjectURL(
-      new Blob([pdfBlob], { type: "application/pdf" }),
+      new Blob([pdfBlob], { type: "application/pdf" })
     );
 
     window.open(pdfUrl, "_blank");
@@ -576,8 +578,11 @@ export default function Home({
 
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+          <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 3 }}>
+            <Tabs
+              value={activeTab}
+              onChange={(e, newValue) => setActiveTab(newValue)}
+            >
               <Tab label="แพคเกจ" />
               <Tab label="หม้อแปลง" />
               <Tab label="อุปกรณ์เสริม" />
@@ -590,12 +595,12 @@ export default function Home({
               <Typography variant="subtitle1" sx={{ mb: 2 }}>
                 PM Preventive Maintenance
               </Typography>
-              
+
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   Standard Package
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   {standardPackage.map((val, i) => (
                     <ItemPackage
                       key={i}
@@ -606,12 +611,12 @@ export default function Home({
                   ))}
                 </Box>
               </Box>
-              
+
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   Premium Package
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   {premuimPackage.map((val, i) => (
                     <ItemPackage
                       key={i}
@@ -622,12 +627,12 @@ export default function Home({
                   ))}
                 </Box>
               </Box>
-              
+
               <Box sx={{ mb: 3 }}>
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   บริการส่องจุดร้อนด้วยกล้องอินฟาเรด
                 </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
                   {thermalPackage.map((val, i) => (
                     <ItemPackage
                       key={i}
@@ -644,7 +649,14 @@ export default function Home({
           {/* หม้อแปลง */}
           {activeTab === 1 && (
             <Box>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
                 <Typography variant="subtitle1" sx={{ mr: 2 }}>
                   Transformer
                 </Typography>
@@ -661,9 +673,9 @@ export default function Home({
                     </Button>
                   }
                   component={
-                    <Box sx={{ p: 2, width: '300px' }}>
+                    <Box sx={{ p: 2, width: "400px" }}>
                       <Autocomplete
-                        disablePortal
+                        // disablePortal
                         options={transformerTypeList}
                         onChange={handleAutoCompleteTr}
                         value={trSizeSelection}
@@ -680,7 +692,7 @@ export default function Home({
                       />
                       {trList.length > 0 && (
                         <Autocomplete
-                          disablePortal
+                          // disablePortal
                           options={trList}
                           getOptionLabel={(option) => option.product}
                           onChange={handleAutoCompleteAddTr}
@@ -716,32 +728,73 @@ export default function Home({
                   </TableHead>
                   <TableBody>
                     {transformerAmount.map((row, i) => (
-                      <TableRow key={i} id={`cell-${row.item.name}-${row.item.type == "transformer" && row.item.product}`}>
+                      <TableRow
+                        key={i}
+                        id={`cell-${row.item.name}-${
+                          row.item.type == "transformer" && row.item.product
+                        }`}
+                      >
                         <TableCell>{row.item.name}</TableCell>
-                        <TableCell>{row.item.type == "transformer" ? row.item.product : ''}</TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          {row.item.type == "transformer"
+                            ? row.item.product
+                            : ""}
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Typography sx={{ mr: 2 }}>{row.amount}</Typography>
                             <Box>
-                              <IconButton size="small" onClick={() => handleChangeAmountTr(i, "add")}>
-                                <AddCircleOutlineIcon fontSize="small" color="primary" />
+                              <IconButton
+                                size="small"
+                                onClick={() => handleChangeAmountTr(i, "add")}
+                              >
+                                <AddCircleOutlineIcon
+                                  fontSize="small"
+                                  color="primary"
+                                />
                               </IconButton>
-                              <IconButton size="small" onClick={() => handleChangeAmountTr(i, "remove")}>
-                                <RemoveCircleOutlineIcon fontSize="small" color="error" />
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  handleChangeAmountTr(i, "remove")
+                                }
+                              >
+                                <RemoveCircleOutlineIcon
+                                  fontSize="small"
+                                  color="error"
+                                />
                               </IconButton>
                             </Box>
                           </Box>
                         </TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit))}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit) * row.amount)}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit))}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit) * row.amount)}</TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.price * (1 + row.item.profit)
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.price * (1 + row.item.profit) * row.amount
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.labour * (1 + row.item.profit)
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.labour * (1 + row.item.profit) * row.amount
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                     {transformerAmount.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
-                          <Typography color="text.secondary">ไม่มีรายการหม้อแปลง</Typography>
+                          <Typography color="text.secondary">
+                            ไม่มีรายการหม้อแปลง
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     )}
@@ -754,7 +807,14 @@ export default function Home({
           {/* อุปกรณ์เสริม */}
           {activeTab === 2 && (
             <Box>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', mb: 3 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
                 <Typography variant="subtitle1" sx={{ mr: 2 }}>
                   อุปกรณ์เสริม
                 </Typography>
@@ -771,9 +831,9 @@ export default function Home({
                     </Button>
                   }
                   component={
-                    <Box sx={{ p: 2, width: '300px' }}>
+                    <Box sx={{ p: 2, width: "300px" }}>
                       <Autocomplete
-                        disablePortal
+                        // disablePortal
                         options={accessoryTypeList}
                         onChange={handleAutoCompleteAccessory}
                         value={accSubTypeSelection}
@@ -790,7 +850,7 @@ export default function Home({
                       />
                       {accList.length > 0 && (
                         <Autocomplete
-                          disablePortal
+                          // disablePortal
                           options={accList}
                           getOptionLabel={(option) => option.name}
                           onChange={handleAutoCompleteAddAccessory}
@@ -829,29 +889,61 @@ export default function Home({
                       <TableRow key={i} id={`cell-${row.item.name}`}>
                         <TableCell>{row.item.name}</TableCell>
                         <TableCell>
-                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
                             <Typography sx={{ mr: 2 }}>{row.amount}</Typography>
                             <Box>
-                              <IconButton size="small" onClick={() => handleChangeAmountItem(i, "add")}>
-                                <AddCircleOutlineIcon fontSize="small" color="primary" />
+                              <IconButton
+                                size="small"
+                                onClick={() => handleChangeAmountItem(i, "add")}
+                              >
+                                <AddCircleOutlineIcon
+                                  fontSize="small"
+                                  color="primary"
+                                />
                               </IconButton>
-                              <IconButton size="small" onClick={() => handleChangeAmountItem(i, "remove")}>
-                                <RemoveCircleOutlineIcon fontSize="small" color="error" />
+                              <IconButton
+                                size="small"
+                                onClick={() =>
+                                  handleChangeAmountItem(i, "remove")
+                                }
+                              >
+                                <RemoveCircleOutlineIcon
+                                  fontSize="small"
+                                  color="error"
+                                />
                               </IconButton>
                             </Box>
                           </Box>
                         </TableCell>
                         <TableCell>{row.item.unit}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit))}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit) * row.amount)}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit))}</TableCell>
-                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit) * row.amount)}</TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.price * (1 + row.item.profit)
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.price * (1 + row.item.profit) * row.amount
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.labour * (1 + row.item.profit)
+                          )}
+                        </TableCell>
+                        <TableCell align="right">
+                          {convertNumToString(
+                            row.item.labour * (1 + row.item.profit) * row.amount
+                          )}
+                        </TableCell>
                       </TableRow>
                     ))}
                     {itemsAmount.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
-                          <Typography color="text.secondary">ไม่มีรายการอุปกรณ์เสริม</Typography>
+                          <Typography color="text.secondary">
+                            ไม่มีรายการอุปกรณ์เสริม
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     )}
@@ -868,30 +960,64 @@ export default function Home({
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} md={8}>
               <Typography variant="h6" fontWeight={500}>
-                ราคารวมทั้งสิ้น: {convertNumToString(total * 1.07)} บาท (รวมภาษีมูลค่าเพิ่ม 7%)
+                ราคารวมทั้งสิ้น: {convertNumToString(total * 1.07)} บาท
+                (รวมภาษีมูลค่าเพิ่ม 7%)
               </Typography>
             </Grid>
             <Grid item xs={12} md={4}>
-              <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
-                <Button 
-                  variant="contained" 
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: { xs: "flex-start", md: "flex-end" },
+                  gap: 1,
+                }}
+              >
+                <Button
+                  variant="contained"
                   color="primary"
+                  disableElevation
+                  sx={{
+                    px: 4,
+                    backgroundColor: "#0056b3 !important",
+                    color: "white !important",
+                    "&:hover": {
+                      backgroundColor: "#003d80 !important",
+                    },
+                  }}
                   startIcon={<SaveIcon />}
                   onClick={() => caQoute && handleSave(caQoute._id)}
                 >
                   บันทึก
                 </Button>
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   color="error"
+                  disableElevation
+                  sx={{
+                    px: 4,
+                    backgroundColor: "#0056b3 !important",
+                    color: "white !important",
+                    "&:hover": {
+                      backgroundColor: "#003d80 !important",
+                    },
+                  }}
                   startIcon={<DeleteIcon />}
                   onClick={() => caQoute && handleDelete(caQoute._id)}
                 >
                   ลบ
                 </Button>
-                <Button 
-                  variant="contained" 
+                <Button
+                  variant="contained"
                   color="info"
+                  disableElevation
+                  sx={{
+                    px: 4,
+                    backgroundColor: "#0056b3 !important",
+                    color: "white !important",
+                    "&:hover": {
+                      backgroundColor: "#003d80 !important",
+                    },
+                  }}
                   startIcon={<PrintIcon />}
                   onClick={() => handleDownload(caQoute)}
                 >
@@ -934,7 +1060,7 @@ function ItemPackage({
           <Typography>{standardPackage.name}</Typography>
           <Typography>
             {convertNumToString(
-              standardPackage.price * (1 + standardPackage.profit),
+              standardPackage.price * (1 + standardPackage.profit)
             )}{" "}
             บาท
           </Typography>
@@ -979,7 +1105,9 @@ function convertData(caQoute: CAQoute, total: number) {
     caQoute.package.forEach((val, i) => {
       data =
         data +
-        `${itemindex}. ${val.item.longName} จำนวนเงิน ${convertNumToString(val.item.price * (1 + val.item.profit))} บาท\n`;
+        `${itemindex}. ${val.item.longName} จำนวนเงิน ${convertNumToString(
+          val.item.price * (1 + val.item.profit)
+        )} บาท\n`;
       itemindex = itemindex + 1;
     });
   }
@@ -987,7 +1115,13 @@ function convertData(caQoute: CAQoute, total: number) {
     caQoute.transformer.forEach((val) => {
       data =
         data +
-        `${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price + val.item.labour) * (1 + val.item.profit) * val.amount)} บาท\n`;
+        `${itemindex}. ค่าหม้อแปลงพร้อมติดตั้ง ${val.item.name} จำนวน ${
+          val.amount
+        } ${val.item.unit} จำนวนเงิน ${convertNumToString(
+          (val.item.price + val.item.labour) *
+            (1 + val.item.profit) *
+            val.amount
+        )} บาท\n`;
       itemindex = itemindex + 1;
     });
   }
@@ -998,7 +1132,13 @@ function convertData(caQoute: CAQoute, total: number) {
     caQoute.accessory.forEach((val) => {
       data =
         data +
-        `   -${val.item.longName} จำนวน ${val.amount} ${val.item.unit} จำนวนเงิน ${convertNumToString((val.item.price + val.item.labour) * (1 + val.item.profit) * val.amount)} บาท\n`;
+        `   -${val.item.longName} จำนวน ${val.amount} ${
+          val.item.unit
+        } จำนวนเงิน ${convertNumToString(
+          (val.item.price + val.item.labour) *
+            (1 + val.item.profit) *
+            val.amount
+        )} บาท\n`;
     });
   }
   data = data + `ราคารวมทั้งสิ้น จำนวน ${convertNumToString(total)} บาท\n`;

@@ -160,11 +160,19 @@ export default function Home() {
 
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-start' }}>
             <Button
-              variant="contained"
+              variant="contained" 
               color="primary"
               startIcon={<SearchIcon />}
               onClick={() => handleSearchCAs()}
-              sx={{ px: 4 }}
+              disableElevation
+              sx={{ 
+                px: 4,
+                backgroundColor: '#0056b3 !important',
+                color: 'white !important',
+                '&:hover': {
+                  backgroundColor: '#003d80 !important'
+                }
+              }}
             >
               ค้นหา
             </Button>
@@ -177,7 +185,6 @@ export default function Home() {
           <Box sx={{ mb: 3 }}>
             <GroupSizesColors
               onClick={(l) => setBottonSw(l)}
-              leftText={"ใบเสนอราคา"}
               rightText={"รายชื่อผู้ใช้ไฟ"}
             />
           </Box>

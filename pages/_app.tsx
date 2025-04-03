@@ -47,6 +47,17 @@ export let theme = createTheme({
           borderRadius: 4,
           textTransform: 'none',
           fontWeight: 500,
+          '&:hover': {
+            backgroundColor: '#003d80',
+            color: 'white',
+          },
+        },
+        containedPrimary: {
+          backgroundColor: '#0056b3',
+          color: 'white',
+          '&:hover': {
+            backgroundColor: '#003d80',
+          },
         },
       },
     },
