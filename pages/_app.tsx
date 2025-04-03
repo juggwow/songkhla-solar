@@ -6,6 +6,7 @@ import { MaterialProvider } from "@/component/meterial-context";
 import { SessionProvider } from "next-auth/react";
 import { SearchCAQouteProvider } from "@/component/search-ca-qoute-context";
 import { AlertAndLoading } from "@/component/alert-loading";
+import Navbar from "@/component/navbar";
 
 const mitr = Noto_Sans_Thai({
   subsets: ["thai", "latin"],
@@ -95,6 +96,7 @@ export default function App({
       <ThemeProvider theme={theme}>
         <SessionProvider session={session}>
           <AlertAndLoading>
+            <Navbar />
             <SearchCAQouteProvider>
               <MaterialProvider>
                 <Component {...pageProps} />
