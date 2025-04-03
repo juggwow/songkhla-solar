@@ -10,9 +10,11 @@ import { CA, CAWithQouteCount, TableCA } from "@/type/ca";
 import {
   Box,
   Button,
+  Card,
   Chip,
   Pagination,
   TablePagination,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -21,7 +23,9 @@ import { useState, useEffect } from "react";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    color: theme.palette.primary,
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+    fontWeight: 600,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -30,11 +34,14 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: "#FFEEFF",
+    backgroundColor: theme.palette.action.hover,
   },
   // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
+  },
+  "&:hover": {
+    backgroundColor: theme.palette.action.selected,
   },
 }));
 
@@ -58,111 +65,84 @@ export default function CATable({
   rowsPerPage: number;
 }) {
   return (
-    <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
-      <Table
-        sx={{ width: 1100, border: "none" }}
-        size="small"
-        aria-label="a dense table"
-      >
-        <TableHead>
-          <TableRow>
-            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-              <CellChip color="success" component={"Action"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-              <CellChip color="success" component={"หมายเลขผู้ใช้ไฟ"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-              <CellChip color="success" component={"หมายเลขมิเตอร์"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-              <CellChip color="success" component={"ชื่อผู้ใช้ไฟ"} />
-            </TableCell>
-            <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-              <CellChip color="success" component={"ที่อยู่"} />
-            </TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {cas.map((row, i) => (
-            <TableRow sx={{ margin: "0.5rem 0 0 0" }} key={i}>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip
-                  color={i % 2 == 0 ? "primary" : "warning"}
-                  component={
-                    <Box>
-                      {row.quoteCount > 0 && (
+    <Card sx={{ width: "100%", overflow: "hidden" }}>
+      <TableContainer>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell width="10%" align="center">จัดการ</StyledTableCell>
+              <StyledTableCell width="15%">หมายเลขผู้ใช้ไฟ</StyledTableCell>
+              <StyledTableCell width="15%">หมายเลขมิเตอร์</StyledTableCell>
+              <StyledTableCell width="25%">ชื่อผู้ใช้ไฟ</StyledTableCell>
+              <StyledTableCell width="35%">ที่อยู่</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {cas.map((row, i) => (
+              <StyledTableRow key={i}>
+                <TableCell align="center">
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    {row.quoteCount > 0 && (
+                      <Tooltip title="ค้นหาใบเสนอราคา">
                         <Button
-                          sx={{ width: 30 }}
+                          size="small"
+                          sx={{ minWidth: 'auto', mx: 0.5 }}
+                          variant="outlined"
+                          color="info"
                           onClick={() => handleSearchQoute(row.ca)}
                         >
-                          <SearchIcon color="secondary" />
+                          <SearchIcon fontSize="small" />
                         </Button>
-                      )}
+                      </Tooltip>
+                    )}
+                    <Tooltip title="สร้างใบเสนอราคาใหม่">
                       <Button
-                        sx={{ width: 30 }}
-                        color="secondary"
+                        size="small"
+                        sx={{ minWidth: 'auto', mx: 0.5 }}
+                        variant="outlined"
+                        color="primary"
                         onClick={() => handleCreateQoute(row.ca)}
                       >
-                        <AddCircleOutlineIcon color="secondary" />
+                        <AddCircleOutlineIcon fontSize="small" />
                       </Button>
-                    </Box>
-                  }
-                />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip
-                  color={i % 2 == 0 ? "primary" : "warning"}
-                  component={
-                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                      {row.ca}
-                    </Typography>
-                  }
-                />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip
-                  color={i % 2 == 0 ? "primary" : "warning"}
-                  component={
-                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                      {row.meter}
-                    </Typography>
-                  }
-                />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 300, padding: "0" }}>
-                <CellChip
-                  color={i % 2 == 0 ? "primary" : "warning"}
-                  component={
-                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                      {row.name}
-                    </Typography>
-                  }
-                />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 500, padding: "0" }}>
-                <CellChip
-                  color={i % 2 == 0 ? "primary" : "warning"}
-                  component={
-                    <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                      {row.address}
-                    </Typography>
-                  }
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <TablePagination
-        component="div"
-        count={count}
-        page={page}
-        onPageChange={(e, v) => onPageChange(v)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
-      />
-    </TableContainer>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
+                <TableCell>{row.ca}</TableCell>
+                <TableCell>{row.meter}</TableCell>
+                <TableCell>{row.name}</TableCell>
+                <TableCell>
+                  <Typography variant="body2" noWrap sx={{ maxWidth: 400 }}>
+                    {row.address}
+                  </Typography>
+                </TableCell>
+              </StyledTableRow>
+            ))}
+            {cas.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    ไม่พบข้อมูลผู้ใช้ไฟ
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 2 }}>
+        <TablePagination
+          component="div"
+          count={count}
+          page={page}
+          onPageChange={(e, v) => onPageChange(v)}
+          rowsPerPage={rowsPerPage}
+          labelRowsPerPage="แถวต่อหน้า:"
+          labelDisplayedRows={({ from, to, count }) => `${from}-${to} จาก ${count !== -1 ? count : `มากกว่า ${to}`}`}
+          onRowsPerPageChange={(e) => onRowsPerPageChange(Number(e.target.value))}
+        />
+      </Box>
+    </Card>
   );
 }
 

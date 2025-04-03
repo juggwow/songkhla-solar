@@ -2,19 +2,27 @@ import {
   Autocomplete,
   Box,
   Button,
+  Card,
+  CardContent,
   Chip,
+  Container,
+  Divider,
+  Grid,
+  IconButton,
+  Tab,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Tabs,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
-import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
+// import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SaveIcon from "@mui/icons-material/Save";
@@ -97,7 +105,7 @@ export default function Home({
     if (!caQoute) {
       router.push("/");
     }
-  }, []);
+  }, [caQoute, router]);
 
   const {
     itemList,
@@ -149,6 +157,7 @@ export default function Home({
     qouterRank: "",
     qouterTel: "",
   });
+  const [activeTab, setActiveTab] = useState(0);
 
   const handleAutoCompleteTr = (
     e: React.SyntheticEvent<Element, Event>,
@@ -400,7 +409,7 @@ export default function Home({
         it.amount * (it.item.price + it.item.labour) * (1 + it.item.profit);
     }
     return total;
-  }, [packages, itemsAmount, forceReRender, transformerAmount]);
+  }, [packages, itemsAmount, transformerAmount]);
 
   const transformerTypeList = useMemo(() => {
     const trs: TransformerItem[] = transformer;
@@ -426,632 +435,474 @@ export default function Home({
 
   useEffect(() => {
     loading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="p-3">
-      <div className="flex flex-row flex-wrap gap-3 items-center">
-        <span>หมายเลขผู้ใช้ไฟ(CA): </span>
-        <TextField
-          value={ca.ca}
-          variant="standard"
-          disabled
-          sx={{ width: "300px" }}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>ชื่อผู้ใช้ไฟ: </span>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Typography variant="h5" sx={{ mb: 3, fontWeight: 600 }}>
+        ใบเสนอราคา
+      </Typography>
 
-        <TextField
-          value={ca.name}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, name: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>ชื่อผู้ลงนาม: </span>
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 3, fontWeight: 500 }}>
+            ข้อมูลลูกค้า
+          </Typography>
 
-        <TextField
-          value={ca.sign}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, sign: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>เรียนถึง: </span>
-
-        <TextField
-          value={ca.rank}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, rank: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>PEA NO: </span>
-
-        <TextField
-          value={ca.peaNo}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, peaNo: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>ขนาดของหม้อแปลง kVA: </span>
-
-        <TextField
-          value={ca.kVA}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, kVA: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>ชนิดของหม้อแปลง: </span>
-
-        <TextField
-          value={ca.trType}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, trType: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>สถานที่: </span>
-        <TextField
-          value={ca.address}
-          variant="standard"
-          sx={{ width: "500px" }}
-          onChange={(e) => setCA({ ...ca, address: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>หมายเลขโทรศัพท์: </span>
-        <TextField
-          value={ca.tel}
-          variant="standard"
-          sx={{ width: "300px" }}
-          onChange={(e) => setCA({ ...ca, tel: e.target.value })}
-        />
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <span>ผู้เสนอราคา: </span>
-        <Autocomplete
-          id="combo-box-demo"
-          disablePortal
-          options={qouterlist}
-          onChange={(e, v) => {
-            v ? setQouter(v) : undefined;
-          }}
-          value={qouter}
-          sx={{
-            fontSize: "12px",
-            width: "300px",
-            margin: "1rem",
-          }}
-          getOptionLabel={(option) => option.qouter}
-          renderInput={(params) => (
-            <TextField color="secondary" variant="standard" {...params} />
-          )}
-        />
-      </div>
-
-      <Chip
-        sx={{ fontSize: "18px", margin: "1rem 0 0 0" }}
-        label={
-          <div className="flex flex-row">
-            <Typography sx={{ margin: "0 3rem 0 0" }}>
-              PM Preventive Maintenance
-            </Typography>
-
-            <KeyboardArrowRightIcon
-              color="secondary"
-              sx={{
-                border: "solid 1px",
-                backgroundColor: "white",
-                borderRadius: "50%",
-                fill: "purple",
-              }}
-            />
-          </div>
-        }
-        color="secondary"
-        clickable={false}
-      />
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <Chip
-          sx={{
-            width: "175px",
-            fontSize: "16px",
-            height: "60px",
-            borderRadius: "",
-          }}
-          label={<Typography>Standard Package</Typography>}
-          clickable={false}
-          color="secondary"
-        />
-        {standardPackage.map((val, i) => {
-          return (
-            <ItemPackage
-              key={i}
-              standardPackage={val}
-              isSelected={hasSelected(packages, val)}
-              handleClick={handleClick}
-            />
-          );
-        })}
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <Chip
-          sx={{
-            width: "175px",
-            fontSize: "16px",
-            height: "60px",
-            borderRadius: "",
-          }}
-          clickable={false}
-          label={<Typography>Premium Package</Typography>}
-          color="secondary"
-        />
-        {premuimPackage.map((val, i) => {
-          return (
-            <ItemPackage
-              key={i}
-              standardPackage={val}
-              isSelected={hasSelected(packages, val)}
-              handleClick={handleClick}
-            />
-          );
-        })}
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <Chip
-          sx={{
-            width: "175px",
-            fontSize: "16px",
-            height: "60px",
-            borderRadius: "",
-          }}
-          label={
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
-              <Typography>บริการส่องจุดร้อน</Typography>
-              <Typography>ด้วยกล้องอินฟาเรต</Typography>
-            </Box>
-          }
-          color="secondary"
-          clickable={false}
-        />
-        {thermalPackage.map((val, i) => {
-          return (
-            <ItemPackage
-              key={i}
-              standardPackage={val}
-              handleClick={handleClick}
-              isSelected={hasSelected(packages, val)}
-            />
-          );
-        })}
-      </div>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <Chip
-          sx={{ fontSize: "18px" }}
-          label={
-            <div className=" flex flex-row">
-              <Typography sx={{ margin: "0 3rem 0 0" }}>Transfomer</Typography>
-              <KeyboardArrowRightIcon
-                color="secondary"
-                sx={{
-                  border: "solid 1px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  fill: "purple",
-                }}
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="หมายเลขผู้ใช้ไฟ (CA)"
+                variant="outlined"
+                size="small"
+                value={ca.ca}
+                disabled
+                margin="normal"
               />
-            </div>
-          }
-          color="secondary"
-          clickable={false}
-        />
-        <AnchorMenu
-          hasChange={addAccessory}
-          label={
-            <div className="flex flex-row items-center">
-              <span>เพิ่มรายการ</span>
-              <AddCircleOutlineIcon />
-            </div>
-          }
-          component={
-            <Box sx={{ height: "400px" }} className="flex flex-col">
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="ชื่อผู้ใช้ไฟ"
+                variant="outlined"
+                size="small"
+                value={ca.name}
+                onChange={(e) => setCA({ ...ca, name: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="หมายเลขโทรศัพท์"
+                variant="outlined"
+                size="small"
+                value={ca.tel}
+                onChange={(e) => setCA({ ...ca, tel: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <TextField
+                fullWidth
+                label="ที่อยู่"
+                variant="outlined"
+                size="small"
+                value={ca.address}
+                onChange={(e) => setCA({ ...ca, address: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="PEA NO"
+                variant="outlined"
+                size="small"
+                value={ca.peaNo}
+                onChange={(e) => setCA({ ...ca, peaNo: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="ขนาดของหม้อแปลง kVA"
+                variant="outlined"
+                size="small"
+                value={ca.kVA}
+                onChange={(e) => setCA({ ...ca, kVA: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="ชนิดของหม้อแปลง"
+                variant="outlined"
+                size="small"
+                value={ca.trType}
+                onChange={(e) => setCA({ ...ca, trType: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="ชื่อผู้ลงนาม"
+                variant="outlined"
+                size="small"
+                value={ca.sign}
+                onChange={(e) => setCA({ ...ca, sign: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                label="เรียนถึง"
+                variant="outlined"
+                size="small"
+                value={ca.rank}
+                onChange={(e) => setCA({ ...ca, rank: e.target.value })}
+                margin="normal"
+              />
+            </Grid>
+            <Grid item xs={12} md={4}>
               <Autocomplete
                 id="combo-box-demo"
-                disablePortal
-                options={transformerTypeList}
-                onChange={handleAutoCompleteTr}
-                value={trSizeSelection}
-                sx={{
-                  fontSize: "12px",
-                  width: "300px",
-                  margin: "1rem",
+                options={qouterlist}
+                getOptionLabel={(option) => option.qouter}
+                onChange={(e, v) => {
+                  v ? setQouter(v) : undefined;
                 }}
+                value={qouter}
                 renderInput={(params) => (
                   <TextField
-                    color="secondary"
-                    variant="standard"
                     {...params}
-                    label="หม้อแปลง"
+                    label="ผู้เสนอราคา"
+                    variant="outlined"
+                    size="small"
+                    margin="normal"
                   />
                 )}
               />
-              {trList.length > 0 && (
-                <Autocomplete
-                  id="combo-box-demo"
-                  disablePortal
-                  options={trList}
-                  getOptionLabel={(option) => option.product}
-                  onChange={handleAutoCompleteAddTr}
-                  value={null}
-                  sx={{
-                    fontSize: "12px",
-                    width: "300px",
-                    margin: "1rem",
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      color="secondary"
-                      variant="standard"
-                      {...params}
-                      label="ผู้ผลิต"
-                    />
-                  )}
-                />
-              )}
-            </Box>
-          }
-        />
-      </div>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
 
-      <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
-        <Table
-          sx={{ width: 1100, border: "none" }}
-          size="small"
-          aria-label="a dense table"
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"รายการ"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ผู้ผลิต"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"จำนวน"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ราคาต่อหน่วย (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ราคารวม (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ค่าแรงต่อหน่วย (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ค่าแรงรวม (บาท)"} />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {transformerAmount.map((row, i) => (
-              <TableRow
-                id={`cell-${row.item.name}-${row.item.type == "transformer" && row.item.product}`}
-                sx={{ margin: "0.5rem 0 0 0" }}
-                key={i}
-              >
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={
-                      <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                        {row.item.name}
-                      </Typography>
-                    }
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={
-                      row.item.type == "transformer" && (
-                        <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                          {row.item.product}
-                        </Typography>
-                      )
-                    }
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={
-                      <div className="flex flex-row justify-between items-center p-0">
-                        <span className="">{row.amount}</span>
-                        <div>
-                          <button
-                            onClick={() => handleChangeAmountTr(i, "add")}
-                          >
-                            <AddCircleOutlineIcon color="success" />
-                          </button>
-                          <button
-                            onClick={() => handleChangeAmountTr(i, "remove")}
-                          >
-                            <RemoveCircleOutlineIcon color="success" />
-                          </button>
-                        </div>
-                      </div>
-                    }
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.price * (1 + row.item.profit),
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.price * (1 + row.item.profit) * row.amount,
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.labour * (1 + row.item.profit),
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.labour * (1 + row.item.profit) * row.amount,
-                    )}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <div className="flex flex-row flex-wrap gap-3 items-center mt-3">
-        <Chip
-          sx={{ fontSize: "18px" }}
-          label={
-            <div className=" flex flex-row">
-              <Typography sx={{ margin: "0 3rem 0 0" }}>
-                Transfomer accessories
-              </Typography>
-              <KeyboardArrowRightIcon
-                color="secondary"
-                sx={{
-                  border: "solid 1px",
-                  backgroundColor: "white",
-                  borderRadius: "50%",
-                  fill: "purple",
-                }}
-              />
-            </div>
-          }
-          color="secondary"
-          clickable={false}
-        />
-        <AnchorMenu
-          hasChange={addAccessory}
-          label={
-            <div className="flex flex-row items-center">
-              <span>เพิ่มรายการ</span>
-              <AddCircleOutlineIcon />
-            </div>
-          }
-          component={
-            <Box sx={{ height: "400px" }} className="flex flex-col">
-              <Autocomplete
-                id="combo-box-demo"
-                disablePortal
-                options={accessoryTypeList}
-                onChange={handleAutoCompleteAccessory}
-                value={accSubTypeSelection}
-                sx={{
-                  fontSize: "12px",
-                  width: "300px",
-                  margin: "1rem",
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    color="secondary"
-                    variant="standard"
-                    {...params}
-                    label="ประเภท"
-                  />
-                )}
-              />
-              {accList.length > 0 && (
-                <Autocomplete
-                  id="combo-box-demo"
-                  disablePortal
-                  options={accList}
-                  getOptionLabel={(option) => option.name}
-                  onChange={handleAutoCompleteAddAccessory}
-                  value={null}
-                  sx={{
-                    fontSize: "12px",
-                    width: "300px",
-                    margin: "1rem",
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      color="secondary"
-                      variant="standard"
-                      {...params}
-                      label="รายการ"
-                    />
-                  )}
-                />
-              )}
-            </Box>
-          }
-        />
-      </div>
-
-      <TableContainer sx={{ padding: 0, margin: "1rem 0" }}>
-        <Table
-          sx={{ width: 1100, border: "none" }}
-          size="small"
-          aria-label="a dense table"
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"รายการ"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"จำนวน"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"หน่วย"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ราคาต่อหน่วย (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ราคารวม (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ค่าแรงต่อหน่วย (บาท)"} />
-              </TableCell>
-              <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                <CellChip component={"ค่าแรงรวม (บาท)"} />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {itemsAmount.map((row, i) => (
-              <TableRow
-                id={`cell-${row.item.name}`}
-                sx={{ margin: "0.5rem 0 0 0" }}
-                key={i}
-              >
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={
-                      <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                        {row.item.name}
-                      </Typography>
-                    }
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={
-                      <div className="flex flex-row justify-between items-center p-0">
-                        <span className="">{row.amount}</span>
-                        <div>
-                          <button
-                            onClick={() => handleChangeAmountItem(i, "add")}
-                          >
-                            <AddCircleOutlineIcon color="success" />
-                          </button>
-                          <button
-                            onClick={() => handleChangeAmountItem(i, "remove")}
-                          >
-                            <RemoveCircleOutlineIcon color="success" />
-                          </button>
-                        </div>
-                      </div>
-                    }
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip component={row.item.unit} />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.price * (1 + row.item.profit),
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.price * (1 + row.item.profit) * row.amount,
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.labour * (1 + row.item.profit),
-                    )}
-                  />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip
-                    component={convertNumToString(
-                      row.item.labour * (1 + row.item.profit) * row.amount,
-                    )}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <Chip
-        sx={{
-          fontSize: "16px",
-          height: "60px",
-          borderRadius: "",
-          margin: "1rem 0 0 0",
-        }}
-        label={
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              flexWrap:"wrap"
-            }}
-          >
-            <Typography>
-              รวมเป็นเงินทั้งสิ้น {convertNumToString(total * 1.07)} บาท
-              รวมภาษีมูลค่าเพิ่ม 7%
-            </Typography>
-            <Box>
-              <Button onClick={() => caQoute && handleSave(caQoute._id)}>
-                <SaveIcon />
-              </Button>
-              <Button onClick={() => caQoute && handleDelete(caQoute._id)}>
-                <DeleteIcon />
-              </Button>
-              <Button onClick={() => handleDownload(caQoute)}>
-                <PrintIcon />
-              </Button>
-            </Box>
+      <Card sx={{ mb: 4 }}>
+        <CardContent>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Tabs value={activeTab} onChange={(e, newValue) => setActiveTab(newValue)}>
+              <Tab label="แพคเกจ" />
+              <Tab label="หม้อแปลง" />
+              <Tab label="อุปกรณ์เสริม" />
+            </Tabs>
           </Box>
-        }
-        color="info"
-        clickable={false}
-      />
-    </div>
+
+          {/* แพคเกจ */}
+          {activeTab === 0 && (
+            <Box>
+              <Typography variant="subtitle1" sx={{ mb: 2 }}>
+                PM Preventive Maintenance
+              </Typography>
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  Standard Package
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                  {standardPackage.map((val, i) => (
+                    <ItemPackage
+                      key={i}
+                      standardPackage={val}
+                      isSelected={hasSelected(packages, val)}
+                      handleClick={handleClick}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  Premium Package
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                  {premuimPackage.map((val, i) => (
+                    <ItemPackage
+                      key={i}
+                      standardPackage={val}
+                      isSelected={hasSelected(packages, val)}
+                      handleClick={handleClick}
+                    />
+                  ))}
+                </Box>
+              </Box>
+              
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                  บริการส่องจุดร้อนด้วยกล้องอินฟาเรด
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                  {thermalPackage.map((val, i) => (
+                    <ItemPackage
+                      key={i}
+                      standardPackage={val}
+                      isSelected={hasSelected(packages, val)}
+                      handleClick={handleClick}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            </Box>
+          )}
+
+          {/* หม้อแปลง */}
+          {activeTab === 1 && (
+            <Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', mb: 3 }}>
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                  Transformer
+                </Typography>
+                <AnchorMenu
+                  hasChange={addAccessory}
+                  label={
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<AddCircleOutlineIcon />}
+                      size="small"
+                    >
+                      เพิ่มรายการ
+                    </Button>
+                  }
+                  component={
+                    <Box sx={{ p: 2, width: '300px' }}>
+                      <Autocomplete
+                        disablePortal
+                        options={transformerTypeList}
+                        onChange={handleAutoCompleteTr}
+                        value={trSizeSelection}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="หม้อแปลง"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                          />
+                        )}
+                      />
+                      {trList.length > 0 && (
+                        <Autocomplete
+                          disablePortal
+                          options={trList}
+                          getOptionLabel={(option) => option.product}
+                          onChange={handleAutoCompleteAddTr}
+                          value={null}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="ผู้ผลิต"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                            />
+                          )}
+                        />
+                      )}
+                    </Box>
+                  }
+                />
+              </Box>
+
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>รายการ</TableCell>
+                      <TableCell>ผู้ผลิต</TableCell>
+                      <TableCell>จำนวน</TableCell>
+                      <TableCell align="right">ราคาต่อหน่วย (บาท)</TableCell>
+                      <TableCell align="right">ราคารวม (บาท)</TableCell>
+                      <TableCell align="right">ค่าแรงต่อหน่วย (บาท)</TableCell>
+                      <TableCell align="right">ค่าแรงรวม (บาท)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {transformerAmount.map((row, i) => (
+                      <TableRow key={i} id={`cell-${row.item.name}-${row.item.type == "transformer" && row.item.product}`}>
+                        <TableCell>{row.item.name}</TableCell>
+                        <TableCell>{row.item.type == "transformer" ? row.item.product : ''}</TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography sx={{ mr: 2 }}>{row.amount}</Typography>
+                            <Box>
+                              <IconButton size="small" onClick={() => handleChangeAmountTr(i, "add")}>
+                                <AddCircleOutlineIcon fontSize="small" color="primary" />
+                              </IconButton>
+                              <IconButton size="small" onClick={() => handleChangeAmountTr(i, "remove")}>
+                                <RemoveCircleOutlineIcon fontSize="small" color="error" />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit))}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit) * row.amount)}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit))}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit) * row.amount)}</TableCell>
+                      </TableRow>
+                    ))}
+                    {transformerAmount.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                          <Typography color="text.secondary">ไม่มีรายการหม้อแปลง</Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
+          {/* อุปกรณ์เสริม */}
+          {activeTab === 2 && (
+            <Box>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', mb: 3 }}>
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                  อุปกรณ์เสริม
+                </Typography>
+                <AnchorMenu
+                  hasChange={addAccessory}
+                  label={
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      startIcon={<AddCircleOutlineIcon />}
+                      size="small"
+                    >
+                      เพิ่มรายการ
+                    </Button>
+                  }
+                  component={
+                    <Box sx={{ p: 2, width: '300px' }}>
+                      <Autocomplete
+                        disablePortal
+                        options={accessoryTypeList}
+                        onChange={handleAutoCompleteAccessory}
+                        value={accSubTypeSelection}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            label="ประเภท"
+                            variant="outlined"
+                            size="small"
+                            fullWidth
+                            sx={{ mb: 2 }}
+                          />
+                        )}
+                      />
+                      {accList.length > 0 && (
+                        <Autocomplete
+                          disablePortal
+                          options={accList}
+                          getOptionLabel={(option) => option.name}
+                          onChange={handleAutoCompleteAddAccessory}
+                          value={null}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              label="รายการ"
+                              variant="outlined"
+                              size="small"
+                              fullWidth
+                            />
+                          )}
+                        />
+                      )}
+                    </Box>
+                  }
+                />
+              </Box>
+
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>รายการ</TableCell>
+                      <TableCell>จำนวน</TableCell>
+                      <TableCell>หน่วย</TableCell>
+                      <TableCell align="right">ราคาต่อหน่วย (บาท)</TableCell>
+                      <TableCell align="right">ราคารวม (บาท)</TableCell>
+                      <TableCell align="right">ค่าแรงต่อหน่วย (บาท)</TableCell>
+                      <TableCell align="right">ค่าแรงรวม (บาท)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {itemsAmount.map((row, i) => (
+                      <TableRow key={i} id={`cell-${row.item.name}`}>
+                        <TableCell>{row.item.name}</TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <Typography sx={{ mr: 2 }}>{row.amount}</Typography>
+                            <Box>
+                              <IconButton size="small" onClick={() => handleChangeAmountItem(i, "add")}>
+                                <AddCircleOutlineIcon fontSize="small" color="primary" />
+                              </IconButton>
+                              <IconButton size="small" onClick={() => handleChangeAmountItem(i, "remove")}>
+                                <RemoveCircleOutlineIcon fontSize="small" color="error" />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell>{row.item.unit}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit))}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.price * (1 + row.item.profit) * row.amount)}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit))}</TableCell>
+                        <TableCell align="right">{convertNumToString(row.item.labour * (1 + row.item.profit) * row.amount)}</TableCell>
+                      </TableRow>
+                    ))}
+                    {itemsAmount.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                          <Typography color="text.secondary">ไม่มีรายการอุปกรณ์เสริม</Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={12} md={8}>
+              <Typography variant="h6" fontWeight={500}>
+                ราคารวมทั้งสิ้น: {convertNumToString(total * 1.07)} บาท (รวมภาษีมูลค่าเพิ่ม 7%)
+              </Typography>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'flex-end' }, gap: 1 }}>
+                <Button 
+                  variant="contained" 
+                  color="primary"
+                  startIcon={<SaveIcon />}
+                  onClick={() => caQoute && handleSave(caQoute._id)}
+                >
+                  บันทึก
+                </Button>
+                <Button 
+                  variant="contained" 
+                  color="error"
+                  startIcon={<DeleteIcon />}
+                  onClick={() => caQoute && handleDelete(caQoute._id)}
+                >
+                  ลบ
+                </Button>
+                <Button 
+                  variant="contained" 
+                  color="info"
+                  startIcon={<PrintIcon />}
+                  onClick={() => handleDownload(caQoute)}
+                >
+                  พิมพ์
+                </Button>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+    </Container>
   );
 }
 

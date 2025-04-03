@@ -18,17 +18,59 @@ export let theme = createTheme({
     fontSize: 14,
   },
   palette: {
-    secondary: {
-      main: "#6B3B7B",
-    },
     primary: {
-      main: "#FFC653",
+      main: "#0056b3",
+    },
+    secondary: {
+      main: "#4a4a4a",
     },
     success: {
-      main: "#DB6773",
+      main: "#4caf50",
     },
     info: {
-      main: "#3C8161",
+      main: "#2196f3",
+    },
+    warning: {
+      main: "#ff9800",
+    },
+    error: {
+      main: "#f44336",
+    },
+    background: {
+      default: "#f5f5f5",
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 4,
+          textTransform: 'none',
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'white',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.08)',
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontWeight: 500,
+        },
+      },
     },
   },
 });

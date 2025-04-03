@@ -9,9 +9,38 @@ import {
   TableRow,
   Chip,
   TableBody,
+  Card,
+  Table,
+  TableContainer,
+  Tooltip,
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { styled } from "@mui/material/styles";
+import { tableCellClasses } from "@mui/material/TableCell";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${tableCellClasses.head}`]: {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+    fontWeight: 600,
+  },
+  [`&.${tableCellClasses.body}`]: {
+    fontSize: 14,
+  },
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  "&:nth-of-type(odd)": {
+    backgroundColor: theme.palette.action.hover,
+  },
+  "&:last-child td, &:last-child th": {
+    border: 0,
+  },
+  "&:hover": {
+    backgroundColor: theme.palette.action.selected,
+  },
+}));
 
 export default function QouteTable({
   showCAQoutes,
@@ -23,105 +52,78 @@ export default function QouteTable({
   handleDelete: (id: string) => void;
 }) {
   return (
-    
-      
-        
-          <Box>
-            <TableHead>
+    <Card sx={{ width: "100%", overflow: "hidden" }}>
+      <TableContainer>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell width="10%" align="center">จัดการ</StyledTableCell>
+              <StyledTableCell width="15%">หมายเลขผู้ใช้ไฟ</StyledTableCell>
+              <StyledTableCell width="20%">ชื่อผู้ใช้ไฟ</StyledTableCell>
+              <StyledTableCell width="40%">รายละเอียดหม้อแปลง</StyledTableCell>
+              <StyledTableCell width="15%" align="right">วงเงินรวมภาษี (บาท)</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {showCAQoutes.map((row, i) => (
+              <StyledTableRow key={i}>
+                <TableCell align="center">
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Tooltip title="แก้ไขใบเสนอราคา">
+                      <Button
+                        size="small"
+                        sx={{ minWidth: 'auto', mx: 0.5 }}
+                        variant="outlined"
+                        color="info"
+                        onClick={() => handleEditQoute(row._id)}
+                      >
+                        <EditIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="ลบใบเสนอราคา">
+                      <Button
+                        size="small"
+                        sx={{ minWidth: 'auto', mx: 0.5 }}
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleDelete(row._id)}
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </Button>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
+                <TableCell>{row.customer.ca}</TableCell>
+                <TableCell>{row.customer.name}</TableCell>
+                <TableCell>
+                  <Typography variant="body2">
+                    {`PEA-No ${row.customer.peaNo || "-"} ขนาด ${row.customer.kVA || "-"} kVA ชนิด ${row.customer.trType || "-"}`}
+                  </Typography>
+                </TableCell>
+                <TableCell align="right">
+                  <Typography variant="body2" fontWeight={500}>
+                    {convertNumToString(totalQoute(
+                      row.package,
+                      row.transformer,
+                      row.accessory,
+                    ))}
+                  </Typography>
+                </TableCell>
+              </StyledTableRow>
+            ))}
+            {showCAQoutes.length === 0 && (
               <TableRow>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip color="success" component={"Action"} />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip color="success" component={"หมายเลขผู้ใช้ไฟ"} />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 220, padding: "0" }}>
-                  <CellChip color="success" component={"ชื่อผู้ใช้ไฟ"} />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 400, padding: "0" }}>
-                  <CellChip color="success" component={"รายละเอียดหม้อแปลง"} />
-                </TableCell>
-                <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                  <CellChip color="success" component={"วงเงินรวมภาษี"} />
+                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
+                  <Typography variant="body1" color="text.secondary">
+                    ไม่พบข้อมูลใบเสนอราคา
+                  </Typography>
                 </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {showCAQoutes.map((row, i) => (
-                <TableRow sx={{ margin: "0.5rem 0 0 0" }} key={i}>
-                  <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                    <CellChip
-                      color={i % 2 == 0 ? "primary" : "warning"}
-                      component={
-                        <Box>
-                          <Button
-                            sx={{ width: 30 }}
-                            onClick={() => handleEditQoute(row._id)}
-                          >
-                            <EditIcon color="secondary" />
-                          </Button>
-
-                          <Button
-                            sx={{ width: 30 }}
-                            onClick={() => handleDelete(row._id)}
-                          >
-                            <DeleteIcon color="secondary" />
-                          </Button>
-                        </Box>
-                      }
-                    />
-                  </TableCell>
-                  <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                    <CellChip
-                      color={i % 2 == 0 ? "primary" : "warning"}
-                      component={
-                        <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                          {row.customer.ca}
-                        </Typography>
-                      }
-                    />
-                  </TableCell>
-                  <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                    <CellChip
-                      color={i % 2 == 0 ? "primary" : "warning"}
-                      component={
-                        <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                          {row.customer.name}
-                        </Typography>
-                      }
-                    />
-                  </TableCell>
-                  <TableCell sx={{ border: "none", width: 300, padding: "0" }}>
-                    <CellChip
-                      color={i % 2 == 0 ? "primary" : "warning"}
-                      component={
-                        <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                          {`PEA-No ${row.customer.peaNo || "..."} ขนาด ${row.customer.kVA || "..."} kVA ชนิด ${row.customer.trType || "..."}`}
-                        </Typography>
-                      }
-                    />
-                  </TableCell>
-                  <TableCell sx={{ border: "none", width: 175, padding: "0" }}>
-                    <CellChip
-                      color={i % 2 == 0 ? "primary" : "warning"}
-                      component={
-                        <Typography sx={{ textWrap: "wrap", fontSize: "12px" }}>
-                          {convertNumToString(totalQoute(
-                            row.package,
-                            row.transformer,
-                            row.accessory,
-                          ))}
-                        </Typography>
-                      }
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Box>
-        
-
-    
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Card>
   );
 }
 
