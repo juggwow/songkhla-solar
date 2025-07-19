@@ -1,4 +1,3 @@
-import { generateConfirmationPDF } from "@/lib/create-pdf";
 import clientPromise from "@/lib/mongodb";
 import { CAQoute } from "@/type/ca";
 import { ObjectId } from "mongodb";

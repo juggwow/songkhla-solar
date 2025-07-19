@@ -42,6 +42,12 @@ export default async function handler(
     const standardPackage = (await itemCollection
       .find({ type: "standard package transformer" })
       .toArray()) as unknown as Package[];
+    const hotlinePackage = (await itemCollection
+      .find({ type: "hotline" })
+      .toArray()) as unknown as Package[];
+    const ugPackage = (await itemCollection
+      .find({ type: "underground" })
+      .toArray()) as unknown as Package[];  
     const transformer = (await itemCollection
       .find({ type: "transformer" })
       .toArray()) as unknown as TransformerItem[];
@@ -55,6 +61,8 @@ export default async function handler(
       thermalPackage,
       premuimPackage,
       standardPackage,
+      hotlinePackage,
+      ugPackage,
       transformer,
       qouterlist,
     });

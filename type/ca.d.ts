@@ -87,6 +87,8 @@ export type MaterialData = {
   thermalPackage: Package[];
   premuimPackage: Package[];
   standardPackage: Package[];
+  hotlinePackage: Package[];
+  ugPackage: Package[];
   transformer: TransformerItem[];
   qouterlist: Qouter[];
 };

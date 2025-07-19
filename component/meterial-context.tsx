@@ -15,6 +15,8 @@ const noMaterialData = {
   premuimPackage: [],
   standardPackage: [],
   transformer: [],
+  hotlinePackage: [],
+  ugPackage: [],
   qouterlist: [],
 };
 const MaterialContext = createContext<MaterialData>(noMaterialData);
