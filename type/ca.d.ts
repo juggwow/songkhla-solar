@@ -92,3 +92,27 @@ export type MaterialData = {
   transformer: TransformerItem[];
   qouterlist: Qouter[];
 };
+
+export type ServiceHistory = {
+  _id : string,
+  ca: string,
+  trCode: string,
+  lastService: string,
+  kva: string
+}
+
+export type PeaNo = {
+  NO: "ERROR" | "OK",
+  MSG_RETURN : string | undefined,
+  CA: string,
+  TR_CODE: string,
+  KVA_TYPE: string,
+  KVA: string,
+  LOCATION: string,
+  LONGITUDE: string,
+  LATITUDE: string,
+}
+
+export type PeaNoTable = {
+  Table: PeaNo[]
+}

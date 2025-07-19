@@ -26,6 +26,8 @@ import { useEffect, useMemo, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SaveIcon from "@mui/icons-material/Save";
+import MapIcon from '@mui/icons-material/Map';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import DeleteIcon from "@mui/icons-material/Delete";
 import PrintIcon from "@mui/icons-material/Print";
 import AnchorMenu from "@/component/anchor-menu";
@@ -36,7 +38,10 @@ import {
   CAQoute,
   Package,
   PackageAmount,
+  PeaNo,
+  PeaNoTable,
   Qouter,
+  ServiceHistory,
   TransformerItem,
   TransformerItemAmount,
 } from "@/type/ca";
@@ -53,6 +58,8 @@ export const getServerSideProps = (async (context) => {
   const propsnull = {
     props: {
       caQoute: null,
+      history: [],
+      peaNo: [],
     },
   };
   if (
@@ -90,15 +97,51 @@ export const getServerSideProps = (async (context) => {
       return propsnull;
     }
     const caQoute = resultFindCAQoute as unknown as CAQoute;
-    return { props: { caQoute } };
+
+    const resultFindHistory = await db.collection("history").find(
+      { ca: caQoute.customer.ca },
+      {
+        projection: {
+          _id: { $toString: "$_id" },
+          ca: 1,
+          trCode: 1,
+          lastService: 1,
+          kva: 1,
+        },
+      }
+    );
+
+    // if (resultFindHistory) {
+
+    // }
+    const history: ServiceHistory[] =
+      (await resultFindHistory.toArray()) as unknown as ServiceHistory[];
+
+    const peaNoTableRespone = await fetch(
+      `https://dmsxupload.pea.co.th/tests3/api/TFM/?procedure=CA_RETURN_TR&parameter=4E6B5078-1S80X403-DB2F9145559C;${caQoute.customer.ca}`
+    );
+    const peaNoTableData = (await peaNoTableRespone.json()) as PeaNoTable;
+    let peaNo: PeaNo[] = [];
+
+    if (peaNoTableData.Table[0].NO == "OK") {
+      peaNo = peaNoTableData.Table;
+    }
+
+    return { props: { caQoute, history, peaNo } };
   } catch (e) {
     await mongoClient.close();
     return propsnull;
   }
-}) satisfies GetServerSideProps<{ caQoute: CAQoute | null }>;
+}) satisfies GetServerSideProps<{
+  caQoute: CAQoute | null;
+  history: ServiceHistory[];
+  peaNo: PeaNo[];
+}>;
 
 export default function Home({
   caQoute,
+  history,
+  peaNo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   useEffect(() => {
@@ -586,6 +629,8 @@ export default function Home({
               <Tab label="แพคเกจ" />
               <Tab label="หม้อแปลง" />
               <Tab label="อุปกรณ์เสริม" />
+              <Tab label="ประวัติการบำรุงรักษา" />
+              <Tab label="รายการหม้อแปลง" />
             </Tabs>
           </Box>
 
@@ -943,6 +988,124 @@ export default function Home({
                         <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
                           <Typography color="text.secondary">
                             ไม่มีรายการอุปกรณ์เสริม
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
+          {/* ประวัติการบำรุงรักษา */}
+          {activeTab === 3 && (
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                  ประวัติการบำรุงรักษา
+                </Typography>
+              </Box>
+
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>หมายเลขผู้ใช้ไฟ</TableCell>
+                      <TableCell>Pea-No</TableCell>
+                      <TableCell>ขนาดหม้อแปลง (kVA)</TableCell>
+                      <TableCell>วันที่บำรุงรักษา</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {history.map((row, i) => (
+                      <TableRow key={i} id={`cell-${row._id}`}>
+                        <TableCell>{row.ca}</TableCell>
+                        <TableCell>{row.trCode}</TableCell>
+                        <TableCell>{row.kva}</TableCell>
+                        <TableCell>{row.lastService}</TableCell>
+                      </TableRow>
+                    ))}
+                    {history.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                          <Typography color="text.secondary">
+                            ไม่มีประวัติการบำรุงรักษา
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
+          {/* ข้อมูลหม้อแปลง */}
+          {activeTab === 4 && (
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  mb: 3,
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ mr: 2 }}>
+                  ข้อมูลหม้อแปลงของผู้ใช้ไฟ
+                </Typography>
+              </Box>
+
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>หมายเลขหม้อแปลง (PEA No.)</TableCell>
+                      <TableCell>ขนาดหม้อแปลง(kVA)/เฟส</TableCell>
+                      <TableCell>สถานที่</TableCell>
+                      <TableCell>แผนที่</TableCell>
+                      <TableCell>ใช้ค่า</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {peaNo.map((row, i) => (
+                      <TableRow key={i} id={`cell-${i}`}>
+                        <TableCell>{row.TR_CODE}</TableCell>
+                        <TableCell>
+                          {row.KVA}/{row.KVA_TYPE}
+                        </TableCell>
+                        <TableCell>{row.LOCATION}</TableCell>
+                        <TableCell>
+                          <IconButton
+                            href={`https://www.google.com/maps/search/?api=1&query=${row.LATITUDE},${row.LONGITUDE}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <MapIcon />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>
+                          <IconButton
+                            onClick={() => setCA({ ...ca, peaNo: row.TR_CODE, kVA: row.KVA })}
+                          >
+                            <EditNoteIcon />
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {peaNo.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={7} align="center" sx={{ py: 2 }}>
+                          <Typography color="text.secondary">
+                            ไม่มีสามารถแสดงข้อมูลได้ด้วยข้อจำกัดบางอย่าง
                           </Typography>
                         </TableCell>
                       </TableRow>
