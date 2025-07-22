@@ -144,11 +144,7 @@ export default function Home({
   peaNo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  // useEffect(() => {
-  //   if (!caQoute) {
-  //     router.push("/");
-  //   }
-  // }, [caQoute, router]);
+ 
 
   const {
     itemList,
@@ -482,6 +478,14 @@ export default function Home({
     loading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+   useEffect(() => {
+    if(!caQoute) return
+    setCA(caQoute.customer)
+    setPackages(caQoute.package)
+    setItemsAmount(caQoute.accessory)
+    setTransformerAmount(caQoute.transformer)
+  }, [caQoute]);
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
