@@ -143,11 +143,11 @@ export default function Home({
   peaNo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
-  useEffect(() => {
-    if (!caQoute) {
-      router.push("/");
-    }
-  }, [caQoute, router]);
+  // useEffect(() => {
+  //   if (!caQoute) {
+  //     router.push("/");
+  //   }
+  // }, [caQoute, router]);
 
   const {
     itemList,
