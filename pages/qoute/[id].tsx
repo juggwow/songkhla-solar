@@ -485,7 +485,7 @@ export default function Home({
     };
 
     getPeaNo()
-    
+
   }, [caQoute]);
 
   return (
@@ -1298,7 +1298,7 @@ function convertData(caQoute: CAQoute, total: number) {
   if (caQoute.accessory.length != 0) {
     data =
       data +
-      `${itemindex}. ค่าอุปกรณ์ประกอบหม้อแปลงจำนวน ${caQoute.accessory.length} รายการ ดังนี้\n`;
+      `${itemindex}. รายการอื่นๆ ${caQoute.accessory.length} รายการ ดังนี้\n`;
     caQoute.accessory.forEach((val) => {
       data =
         data +
