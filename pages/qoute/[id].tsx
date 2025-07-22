@@ -117,15 +117,15 @@ export const getServerSideProps = (async (context) => {
     const history: ServiceHistory[] =
       (await resultFindHistory.toArray()) as unknown as ServiceHistory[];
 
-    const peaNoTableRespone = await fetch(
-      `https://dmsxupload.pea.co.th/tests3/api/TFM/?procedure=CA_RETURN_TR&parameter=4E6B5078-1S80X403-DB2F9145559C;${caQoute.customer.ca}`
-    );
-    const peaNoTableData = (await peaNoTableRespone.json()) as PeaNoTable;
+    // const peaNoTableRespone = await fetch(
+    //   `https://dmsxupload.pea.co.th/tests3/api/TFM/?procedure=CA_RETURN_TR&parameter=4E6B5078-1S80X403-DB2F9145559C;${caQoute.customer.ca}`
+    // );
+    // const peaNoTableData = (await peaNoTableRespone.json()) as PeaNoTable;
     let peaNo: PeaNo[] = [];
 
-    if (peaNoTableData.Table[0].NO == "OK") {
-      peaNo = peaNoTableData.Table;
-    }
+    // if (peaNoTableData.Table[0].NO == "OK") {
+    //   peaNo = peaNoTableData.Table;
+    // }
 
     return { props: { caQoute, history, peaNo } };
   } catch (e) {
