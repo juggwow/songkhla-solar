@@ -26,8 +26,8 @@ import { useEffect, useMemo, useState } from "react";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import SaveIcon from "@mui/icons-material/Save";
-import MapIcon from '@mui/icons-material/Map';
-import EditNoteIcon from '@mui/icons-material/EditNote';
+import MapIcon from "@mui/icons-material/Map";
+import EditNoteIcon from "@mui/icons-material/EditNote";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PrintIcon from "@mui/icons-material/Print";
 import AnchorMenu from "@/component/anchor-menu";
@@ -59,7 +59,6 @@ export const getServerSideProps = (async (context) => {
     props: {
       caQoute: null,
       history: [],
-      peaNo: [],
     },
   };
   if (
@@ -117,17 +116,7 @@ export const getServerSideProps = (async (context) => {
     const history: ServiceHistory[] =
       (await resultFindHistory.toArray()) as unknown as ServiceHistory[];
 
-    // const peaNoTableRespone = await fetch(
-    //   `https://dmsxupload.pea.co.th/tests3/api/TFM/?procedure=CA_RETURN_TR&parameter=4E6B5078-1S80X403-DB2F9145559C;${caQoute.customer.ca}`
-    // );
-    // const peaNoTableData = (await peaNoTableRespone.json()) as PeaNoTable;
-    let peaNo: PeaNo[] = [];
-
-    // if (peaNoTableData.Table[0].NO == "OK") {
-    //   peaNo = peaNoTableData.Table;
-    // }
-
-    return { props: { caQoute, history, peaNo } };
+    return { props: { caQoute, history } };
   } catch (e) {
     await mongoClient.close();
     return propsnull;
@@ -135,19 +124,13 @@ export const getServerSideProps = (async (context) => {
 }) satisfies GetServerSideProps<{
   caQoute: CAQoute | null;
   history: ServiceHistory[];
-  peaNo: PeaNo[];
 }>;
 
 export default function Home({
   caQoute,
   history,
-  peaNo,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
- 
-  console.log(history)
-  console.log(peaNo)
-  console.log(caQoute)
 
   const {
     itemList,
@@ -200,6 +183,7 @@ export default function Home({
     qouterTel: "",
   });
   const [activeTab, setActiveTab] = useState(0);
+  const [peaNo, setPeaNo] = useState<PeaNo[]>([]);
 
   const handleAutoCompleteTr = (
     e: React.SyntheticEvent<Element, Event>,
@@ -477,14 +461,31 @@ export default function Home({
     });
   }, [itemList]);
 
-   useEffect(() => {
-    console.log("use effect")
+  useEffect(() => {
+    console.log("use effect");
     loading(false);
-    if(!caQoute) return
-    setCA(caQoute.customer)
-    setPackages(caQoute.package)
-    setItemsAmount(caQoute.accessory)
-    setTransformerAmount(caQoute.transformer)
+    if (!caQoute) return;
+    setCA(caQoute.customer);
+    setPackages(caQoute.package);
+    setItemsAmount(caQoute.accessory);
+    setTransformerAmount(caQoute.transformer);
+
+    const getPeaNo = async () => {
+      const peaNoTableRespone = await fetch(
+        `https://dmsxupload.pea.co.th/tests3/api/TFM/?procedure=CA_RETURN_TR&parameter=4E6B5078-1S80X403-DB2F9145559C;${caQoute.customer.ca}`
+      );
+      const peaNoTableData = (await peaNoTableRespone.json()) as PeaNoTable;
+      let peaNo: PeaNo[] = [];
+
+      if (peaNoTableData.Table[0].NO == "OK") {
+        peaNo = peaNoTableData.Table;
+      }
+
+      setPeaNo(peaNo)
+    };
+
+    getPeaNo()
+    
   }, [caQoute]);
 
   return (
@@ -1098,7 +1099,9 @@ export default function Home({
                         </TableCell>
                         <TableCell>
                           <IconButton
-                            onClick={() => setCA({ ...ca, peaNo: row.TR_CODE, kVA: row.KVA })}
+                            onClick={() =>
+                              setCA({ ...ca, peaNo: row.TR_CODE, kVA: row.KVA })
+                            }
                           >
                             <EditNoteIcon />
                           </IconButton>
