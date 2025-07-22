@@ -145,6 +145,9 @@ export default function Home({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
  
+  console.log(history)
+  console.log(peaNo)
+  console.log(caQoute)
 
   const {
     itemList,
@@ -474,12 +477,9 @@ export default function Home({
     });
   }, [itemList]);
 
-  useEffect(() => {
-    loading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
    useEffect(() => {
+    console.log("use effect")
+    loading(false);
     if(!caQoute) return
     setCA(caQoute.customer)
     setPackages(caQoute.package)
