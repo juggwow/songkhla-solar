@@ -43,7 +43,7 @@ export default function Reports() {
 
       <Grid container spacing={3}>
         {/* รายการรายงาน */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card sx={{ mb: 3 }}>
             <CardContent>
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
@@ -83,7 +83,7 @@ export default function Reports() {
         </Grid>
 
         {/* พื้นที่แสดงรายงาน */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Card sx={{ minHeight: '500px' }}>
             <CardContent>
               {!selectedReport ? (

@@ -6,8 +6,6 @@ import {
   CardContent,
   Chip,
   Container,
-  Divider,
-  Grid,
   IconButton,
   Tab,
   Table,
@@ -19,6 +17,7 @@ import {
   Tabs,
   TextField,
   Tooltip,
+  Grid,
   Typography,
 } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
@@ -496,7 +495,7 @@ export default function Home({
           </Typography>
 
           <Grid container spacing={3}>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="หมายเลขผู้ใช้ไฟ (CA)"
@@ -507,7 +506,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="ชื่อผู้ใช้ไฟ"
@@ -518,7 +517,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="หมายเลขโทรศัพท์"
@@ -529,7 +528,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <TextField
                 fullWidth
                 label="ที่อยู่"
@@ -540,7 +539,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="PEA NO"
@@ -551,7 +550,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="ขนาดของหม้อแปลง kVA"
@@ -562,7 +561,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="ชนิดของหม้อแปลง"
@@ -573,7 +572,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="ชื่อผู้ลงนาม"
@@ -584,7 +583,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 label="เรียนถึง"
@@ -595,7 +594,7 @@ export default function Home({
                 margin="normal"
               />
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Autocomplete
                 id="combo-box-demo"
                 options={qouterlist}
@@ -1121,13 +1120,13 @@ export default function Home({
       <Card>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
-            <Grid item xs={12} md={8}>
+            <Grid size={{ xs: 12, md: 8 }}>
               <Typography variant="h6" fontWeight={500}>
                 ราคารวมทั้งสิ้น: {convertNumToString(total * 1.07)} บาท
                 (รวมภาษีมูลค่าเพิ่ม 7%)
               </Typography>
             </Grid>
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <Box
                 sx={{
                   display: "flex",

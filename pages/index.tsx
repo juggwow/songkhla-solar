@@ -112,7 +112,7 @@ export default function Home() {
           </Typography>
 
           <Grid container spacing={2}>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -123,7 +123,7 @@ export default function Home() {
                 label="รหัสผู้ใช้ไฟ (CA)"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -134,7 +134,7 @@ export default function Home() {
                 label="ชื่อ-นามสกุล"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -145,7 +145,7 @@ export default function Home() {
                 label="หมายเลขมิเตอร์"
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid size={{ xs: 12, md: 3 }}>
               <TextField
                 fullWidth
                 variant="outlined"
